@@ -1,0 +1,19 @@
+{
+  "name": "generator-gruntlate",
+  "version": "0.0.0",
+  "description": "",
+  "author": {
+    "name" : "Sebastian Herber",
+    "email" : "herber@zaplab.at",
+    "url" : "http://www.zaplab.at"
+  },
+  "private": true,
+  "files": [
+    "app"
+  ],
+  "keywords": ["yeoman-generator"],
+  "dependencies": {
+    "chalk": "^1.0.0",
+    "yeoman-generator": "^0.17.3"
+  }
+}
