@@ -420,11 +420,13 @@ module.exports = yeoman.generators.Base.extend({
         },
 
         jekyll: function () {
-            this.mkdir(this.sourcePath + '/jekyll');
-            this.copy('src/jekyll/_config.yml', this.sourcePath + '/jekyll/_config.yml');
-            this.copy('src/jekyll/index.html', this.sourcePath + '/jekyll/index.html');
-            this.copy('src/jekyll/_layouts/default.html', this.sourcePath + '/jekyll/_layouts/default.html');
-            this.copy('src/jekyll/_includes/main-navigation.html', this.sourcePath + '/jekyll/_includes/main-navigation.html');
+            if (this.settingsDocumentation) {
+                this.mkdir(this.sourcePath + '/jekyll');
+                this.copy('src/jekyll/_config.yml', this.sourcePath + '/jekyll/_config.yml');
+                this.copy('src/jekyll/index.html', this.sourcePath + '/jekyll/index.html');
+                this.copy('src/jekyll/_layouts/default.html', this.sourcePath + '/jekyll/_layouts/default.html');
+                this.copy('src/jekyll/_includes/main-navigation.html', this.sourcePath + '/jekyll/_includes/main-navigation.html');
+            }
         },
 
         test: function () {
