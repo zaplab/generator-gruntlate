@@ -403,6 +403,7 @@ module.exports = yeoman.generators.Base.extend({
             }
 
             if (this.testMocha) {
+                packageJSON.devDependencies['grunt-contrib-connect'] = '^0.10.1';
                 packageJSON.devDependencies['grunt-mocha'] = '^0.4.12';
             }
 
@@ -432,6 +433,15 @@ module.exports = yeoman.generators.Base.extend({
         test: function () {
             this.mkdir(this.testsPath + '/unit');
             this.copy('tests/unit/basic.js', this.testsPath + '/unit/basic.js');
+            this.copy('tests/tests.html', this.testsPath + '/tests.html');
+
+            if (this.moduleLoader == "requirejs") {
+                this.mkdir(this.testsPath + '/unit/requirejs');
+                this.copy('tests/unit/requirejs/_main.js', this.testsPath + '/unit/requirejs/_main.js');
+                this.copy('tests/unit/requirejs/basic.js', this.testsPath + '/unit/requirejs/basic.js');
+                this.copy('tests/unit/basic.js', this.testsPath + '/unit/basic.js');
+                this.copy('tests/tests-requirejs.html', this.testsPath + '/tests-requirejs.html');
+            }
         }
     },
 

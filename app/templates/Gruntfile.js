@@ -79,6 +79,34 @@ module.exports = function(grunt) {
         },
         <% if (testMocha) { %>
         copy: {
+            testLibsChai: {
+                nonull: true,
+                src: [
+                    'src/libs/bower/chai/chai.js'
+                ],
+                dest: 'tests/libs/chai.js'
+            },
+            testLibsMocha: {
+                nonull: true,
+                src: [
+                    'src/libs/bower/mocha/mocha.js'
+                ],
+                dest: 'tests/libs/mocha.js'
+            },
+            testLibsMochaCss: {
+                nonull: true,
+                    src: [
+                    'src/libs/bower/mocha/mocha.css'
+                ],
+                    dest: 'tests/libs/mocha.css'
+            },<% if (moduleLoader == "requirejs") { %>
+            testLibsRequirejs: {
+                nonull: true,
+                src: [
+                    'src/libs/bower/requirejs/require.js'
+                ],
+                dest: 'tests/libs/require.js'
+            },<% } %>
             testDist: {
                 nonull: true,
                 src: [
@@ -154,15 +182,31 @@ module.exports = function(grunt) {
         },
         <% if (testMocha) { %>
 
+        connect: {
+            testServer: {
+                options: {
+                    hostname: 'localhost',
+                        port: 8080,
+                        base: 'tests/'
+                }
+            }
+        },
+
         mocha: {
             options: {
                 run: true
             },
-            dist: {
-                src: [
-                    '<%= testsPath %>/dist.html'
-                ]
-            }
+            normal: {
+                options: {
+                    urls: ['http://localhost:8080/tests.html']
+                }
+            }<% if (moduleLoader == "requirejs") { %>,
+            withRequireJs: {
+                options: {
+                    run: false,
+                        urls: ['http://localhost:8080/tests-requirejs.html']
+                }
+            }<% } %>
         },<% } %>
 
         watch: {
@@ -204,9 +248,16 @@ module.exports = function(grunt) {
         'csslint:dist'
     ]);
     grunt.registerTask('test-js', [
-        'jshint:dist',
-        'copy:testDist'<% if (testMocha) { %>,
-        'mocha:dist'<% } %>
+        'jshint:dist'<% if (testMocha) { %>,
+        'copy:testLibsChai',
+        'copy:testLibsMocha',
+        'copy:testLibsMochaCss',
+        <% if (moduleLoader == "requirejs") { %>
+        'copy:testLibsRequirejs',<% } %>
+        'copy:testDist',
+        'connect:testServer',
+        'mocha:normal'<% if (moduleLoader == "requirejs") { %>,
+        'mocha:withRequireJs'<% } %><% } %>
     ]);
     grunt.registerTask('test', [
         'test-css',
