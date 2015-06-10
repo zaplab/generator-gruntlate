@@ -450,6 +450,10 @@ module.exports = yeoman.generators.Base.extend({
         if (this.options['skip-install']) {
             var installInfo = 'To install:\n> ' + chalk.yellow.bold('npm install && bower install');
 
+            if (this.testMocha) {
+                installInfo += chalk.yellow.bold('grunt install-tests');
+            }
+
             if (this.settingsDocumentation) {
                 installInfo += chalk.yellow.bold(' && bundler install');
             }
@@ -459,6 +463,10 @@ module.exports = yeoman.generators.Base.extend({
         } else {
             this.installDependencies({
                 callback: function () {
+                    if (this.testMocha) {
+                        this.spawnCommand('grunt', ['install-tests']);
+                    }
+
                     if (this.settingsDocumentation) {
                         this.spawnCommand('bundler', ['install']);
                     }

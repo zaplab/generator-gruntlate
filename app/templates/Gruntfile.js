@@ -244,15 +244,17 @@ module.exports = function(grunt) {
     <% if (settingsTests) { %>
 
     // Testing
+    <% if (testMocha) { %>grunt.registerTask('install-tests', [
+        'copy:testLibsChai',
+        'copy:testLibsMocha',
+        'copy:testLibsMochaCss'
+    ]);<% } %>
+
     grunt.registerTask('test-css', [
         'csslint:dist'
     ]);
     grunt.registerTask('test-js', [
-        'jshint:dist'<% if (testMocha) { %>,
-        'copy:testLibsChai',
-        'copy:testLibsMocha',
-        'copy:testLibsMochaCss',
-        <% if (moduleLoader == "requirejs") { %>
+        'jshint:dist'<% if (testMocha) { %>,<% if (moduleLoader == "requirejs") { %>
         'copy:testLibsRequirejs',<% } %>
         'copy:testDist',
         'connect:testServer',
