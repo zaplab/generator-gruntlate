@@ -431,16 +431,18 @@ module.exports = yeoman.generators.Base.extend({
         },
 
         test: function () {
-            this.mkdir(this.testsPath + '/unit');
-            this.copy('tests/unit/basic.js', this.testsPath + '/unit/basic.js');
-            this.copy('tests/tests.html', this.testsPath + '/tests.html');
-
-            if (this.moduleLoader == "requirejs") {
-                this.mkdir(this.testsPath + '/unit/requirejs');
-                this.copy('tests/unit/requirejs/_main.js', this.testsPath + '/unit/requirejs/_main.js');
-                this.copy('tests/unit/requirejs/basic.js', this.testsPath + '/unit/requirejs/basic.js');
+            if (this.testMocha) {
+                this.mkdir(this.testsPath + '/unit');
                 this.copy('tests/unit/basic.js', this.testsPath + '/unit/basic.js');
-                this.copy('tests/tests-requirejs.html', this.testsPath + '/tests-requirejs.html');
+                this.copy('tests/tests.html', this.testsPath + '/tests.html');
+
+                if (this.moduleLoader == "requirejs") {
+                    this.mkdir(this.testsPath + '/unit/requirejs');
+                    this.copy('tests/unit/requirejs/_main.js', this.testsPath + '/unit/requirejs/_main.js');
+                    this.copy('tests/unit/requirejs/basic.js', this.testsPath + '/unit/requirejs/basic.js');
+                    this.copy('tests/unit/basic.js', this.testsPath + '/unit/basic.js');
+                    this.copy('tests/tests-requirejs.html', this.testsPath + '/tests-requirejs.html');
+                }
             }
         }
     },

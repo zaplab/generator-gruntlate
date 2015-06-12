@@ -242,7 +242,6 @@ module.exports = function(grunt) {
         }
     });
     <% if (settingsTests) { %>
-
     // Testing
     <% if (testMocha) { %>grunt.registerTask('install-tests', [
         'copy:testLibsChai',
@@ -251,10 +250,10 @@ module.exports = function(grunt) {
     ]);<% } %>
 
     grunt.registerTask('test-css', [
-        'csslint:dist'
+        <% if (testCssLint) { %>'csslint:dist'<% } %>
     ]);
     grunt.registerTask('test-js', [
-        'jshint:dist'<% if (testMocha) { %>,<% if (moduleLoader == "requirejs") { %>
+        <% if (testJsHint) { %>'jshint:dist'<% if (testMocha) { %>,<% } %><% } %><% if (testMocha) { %><% if (moduleLoader == "requirejs") { %>
         'copy:testLibsRequirejs',<% } %>
         'copy:testDist',
         'connect:testServer',
