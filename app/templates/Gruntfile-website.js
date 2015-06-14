@@ -32,29 +32,56 @@ module.exports = function(grunt) {
         ' All rights reserved.\n' +
         ' <%%= pkg.description %>\n' +
         '*/',
-
+        <% if (addServeTask) { %>
+        browserSync: {
+            dev: {
+                bsFiles: {
+                    src : [
+                        '<%= distributionPath %>/resources/css/*.css',
+                        '<%= distributionPath %>/resources/img/**',
+                        '<%= distributionPath %>/resources/js/*.js',
+                        '<%= distributionPath %>/*.html'
+                    ]
+                },
+                options: {
+                    watchTask: true,
+                    server: './<%= distributionPath %>'
+                }
+            }
+        },
+        <% } %>
         clean: {
-            start: [],
-            dist: [
-                '<%= options.distributionPath %>/css',
-                '<%= options.distributionPath %>/img',
-                '<%= options.distributionPath %>/js'
+            start: [
+                'tmp'
             ],
-            end: []
+            dist: [
+                '<%= distributionPath %>/resources/css',
+                '<%= distributionPath %>/resources/img',
+                '<%= distributionPath %>/resources/js'
+            ],
+            end: [
+                'tmp'
+            ]
         },
 
         concat: {
             options: {
-                banner: '<%%= banner %>',
                 sourceMap: isDevMode,
                 stripBanners: true
             },
+            initJs: {
+                src: [<% if (featureModernizr) { %>
+                    'tmp/js/modernizr.js'<% } %><% if (moduleLoader == "requirejs") { %><% if (featureModernizr) { %>,<% } %>
+                    '<%= sourcePath %>/libs/bower/requirejs/require.js'<% } %>
+                ],
+                dest: '<%= distributionPath %>/resources/js/init.js'
+            }<% if (moduleLoader != "requirejs") { %>,
             js: {
                 src: [
                     '<%= sourcePath %>/js/main.js'
                 ],
-                dest: '<%= distributionPath %>/js/main.js'
-            }
+                dest: '<%= distributionPath %>/resources/js/main.js'
+            }<% } %>
         },<% if (testCssLint) { %>
 
         csslint: {
@@ -63,7 +90,7 @@ module.exports = function(grunt) {
                     csslintrc: '<%= testsPath %>/.csslintrc'
                 },
                 src: [
-                    '<%= distributionPath %>/css/main.css'
+                    '<%= distributionPath %>/resources/css/main.css'
                 ]
             }
         },<% } %>
@@ -71,14 +98,15 @@ module.exports = function(grunt) {
         cssmin: {
             dist: {
                 files: {
-                    <% if (settingsMinFiles) { %>'<%= distributionPath %>/css/main.min.css'<% } else { %>'<%= distributionPath %>/css/main.css'<% } %>: [
-                        '<%= distributionPath %>/css/main.css'
+                    '<%= distributionPath %>/resources/css/main.css': [
+                        '<%= distributionPath %>/resources/css/main.css'
                     ]
                 }
             }
         },
-        <% if (testMocha) { %>
+        <% if (testMocha || htmlBasic) { %>
         copy: {
+            <% if (testMocha) { %><% } %>
             testLibsChai: {
                 nonull: true,
                 src: [
@@ -110,7 +138,7 @@ module.exports = function(grunt) {
             testDist: {
                 nonull: true,
                 src: [
-                    '<%= distributionPath %>/js/main.js'
+                    '<%= distributionPath %>/resources/js/main.js'
                 ],
                 dest: '<%= testsPath %>/dist/js/main.js'
             }
@@ -122,7 +150,15 @@ module.exports = function(grunt) {
                     text: isDevMode ? '' : '<%%= banner %>'
                 },
                 files: {
-                    '<%= distributionPath %>/css/main.css': '<%= distributionPath %>/css/main.css'
+                    '<%= distributionPath %>/resources/css/main.css': '<%= distributionPath %>/resources/css/main.css'
+                }
+            },
+            jsDist: {
+                options: {
+                    text: isDevMode ? '' : '<%%= banner %>'
+                },
+                files: {
+                    '<%= distributionPath %>/resources/js/main.js': '<%= distributionPath %>/resources/js/main.js'
                 }
             }
         },
@@ -138,10 +174,23 @@ module.exports = function(grunt) {
                     src: [
                         '**/*.{png,jpg,gif}'
                     ],
-                    dest: '<%= distributionPath %>/img/'
+                    dest: '<%= distributionPath %>/resources/img/'
                 }]
             }
-        },
+        },<% if (htmlJekyll) { %>
+
+        jekyll: {
+            options: {
+                bundleExec: true
+            },
+            doc: {
+                options: {
+                    raw: 'devMode: ' + (isDevMode ? 'true' : 'false'),
+                    src: '<%= sourcePath %>/jekyll',
+                    dest: '<%= distributionPath %>'
+                }
+            }
+        },<% } %>
         <% if (testJsHint) { %>
 
         jshint: {
@@ -153,8 +202,23 @@ module.exports = function(grunt) {
                     '<%= sourcePath %>/js/*.js'
                 ]
             }
-        },
+        },<% if (featureModernizr) { %>
 
+        modernizr: {
+            dist: {
+                devFile: '<%= sourcePath %>/libs/bower/modernizr/modernizr.js',
+                outputFile: 'tmp/js/modernizr.js',
+                uglify: false,
+                extra : {},
+                files: {
+                    src: [
+                        '<%= distributionPath %>/resources/js/**/*',
+                        '<%= distributionPath %>/resources/css/**/*'
+                    ]
+                }
+            }
+        },
+        <% } %>
         uglify: {
             options: {
                 preserveComments: 'some',
@@ -162,21 +226,20 @@ module.exports = function(grunt) {
             },
             dist: {
                 src: [
-                    '<%%= concat.js.dest %>'
+                    '<%= distributionPath %>/resources/js/main.js'
                 ],
-                dest: <% if (settingsMinFiles) { %>'<%= distributionPath %>/js/main.min.js'<% } else { %>'<%= distributionPath %>/js/main.js'<% } %>
+                dest: '<%= distributionPath %>/resources/js/main.js'
             }
         },<% } %>
 
         sass: {
             options: {
-                // TODO: ['expanded' and 'compact' are not currently supported by libsass]
                 outputStyle: isDevMode ? 'expanded' : 'compressed',
                 sourceMap: isDevMode
             },
             dist: {
                 files: {
-                    '<%= distributionPath %>/css/main.css': '<%= sourcePath %>/css/main.scss'
+                    '<%= distributionPath %>/resources/css/main.css': '<%= sourcePath %>/css/main.scss'
                 }
             }
         },
@@ -195,18 +258,31 @@ module.exports = function(grunt) {
         mocha: {
             options: {
                 run: true
-            },
-            normal: {
+            },<% if (moduleLoader == "requirejs") { %>
+            dist: {
+                options: {
+                    run: false,
+                    urls: ['http://localhost:8080/tests.html']
+                }
+            }<% } else { %>
+            dist: {
                 options: {
                     urls: ['http://localhost:8080/tests.html']
                 }
-            }<% if (moduleLoader == "requirejs") { %>,
-            withRequireJs: {
-                options: {
-                    run: false,
-                        urls: ['http://localhost:8080/tests-requirejs.html']
-                }
             }<% } %>
+        },<% } %><% if (moduleLoader == "requirejs") { %>
+        requirejs: {
+            main: {
+                options: {
+                    optimize: isDevMode ? 'none' : 'uglify2',
+                    generateSourceMaps: isDevMode ? true : false,
+                    baseUrl: './',
+                    mainConfigFile: '<%= sourcePath %>/js/config/requirejs.js',
+                    name: '<%= sourcePath %>/js/main.js',
+                    out: '<%= distributionPath %>/resources/js/main.js',
+                    include: []
+                }
+            }
         },<% } %>
 
         watch: {
@@ -216,8 +292,17 @@ module.exports = function(grunt) {
                 ],
                 tasks: [
                     'clean:start',
-                    'css',
+                    'css',<% if (featureModernizr) { %>
+                    'modernizr:dist',<% } %>
                     'clean:end'
+                ]
+            },
+            img: {
+                files: [
+                    '<%= sourcePath %>/img/**'
+                ],
+                    tasks: [
+                    'imagemin:dist'
                 ]
             },
             js: {
@@ -226,22 +311,24 @@ module.exports = function(grunt) {
                 ],
                 tasks: [
                     'clean:start',
-                    'js',
+                    'js',<% if (featureModernizr) { %>
+                    'modernizr:dist',<% } %>
                     'clean:end'
                 ]
-            },
+            }<% if (!addServeTask) { %>,
+            // TODO: Deprecated in favor of Browsersync which needs more evaluating
             livereload: {
                 options: {
                     livereload: 1337
                 },
                 files: [
-                    '<%= distributionPath %>/css/main.css',
-                    '<%= distributionPath %>/js/main.js'
+                    '<%= distributionPath %>/resources/css/main.css',
+                    '<%= distributionPath %>/resources/js/main.js'
                 ]
-            }
+            }<% } %>
         }
     });
-    <% if (settingsTests) { %>
+    <% if (testCssLint || testJsHint || testMocha) { %>
     // Testing
     <% if (testMocha) { %>grunt.registerTask('install-tests', [
         'copy:testLibsChai',
@@ -257,8 +344,7 @@ module.exports = function(grunt) {
         'copy:testLibsRequirejs',<% } %>
         'copy:testDist',
         'connect:testServer',
-        'mocha:normal'<% if (moduleLoader == "requirejs") { %>,
-        'mocha:withRequireJs'<% } %><% } %>
+        'mocha:dist'<% } %>
     ]);
     grunt.registerTask('test', [
         'test-css',
@@ -267,11 +353,11 @@ module.exports = function(grunt) {
 
     cssTask = [
         'sass:dist',
-        <% if (settingsTests) { %>'test-css'<% } %><% if (settingsMinFiles) { %>,
+        <% if (testCssLint) { %>'test-css'<% } %><% if (projectType == 'module') { %>,
         'cssmin:dist'<% } %>
     ];
 
-    <% if (!settingsMinFiles) { %>if (!isDevMode) {
+    <% if (projectType != 'module') { %>if (!isDevMode) {
         cssTask.push('cssmin:dist');
     }<% } %>
 
@@ -281,7 +367,10 @@ module.exports = function(grunt) {
     grunt.registerTask('css', cssTask);
 
     jsTask = [
-        'concat:js'<% if (settingsTests) { %>,
+        <% if (moduleLoader == "requirejs") { %>'requirejs:main'<% } else { %>'concat:js'<% } %>,
+        'header:jsDist',<% if (featureModernizr) { %>
+        'modernizr:dist',<% } %>
+        'concat:initJs'<% if (testJsHint) { %>,
         'test-js'<% } %>
     ];
 
@@ -295,8 +384,20 @@ module.exports = function(grunt) {
     // Images
     grunt.registerTask('images', [
         'imagemin:dist'
-    ]);
+    ]);<% if (htmlJekyll) { %>
 
+    grunt.registerTask('doc', [
+        'jekyll',
+        'default'
+        // TODO: copy js & css to doc path
+    ]);<% } %><% if (addServeTask) { %>
+
+    grunt.registerTask('serve', [
+        <% if (htmlJekyll) { %>'doc'<% } else {%>'default'<% } %>,
+        'browserSync',
+        'watch'
+    ]);
+    <% } %>
     // Default task
     grunt.registerTask('default', [
         'clean:start',

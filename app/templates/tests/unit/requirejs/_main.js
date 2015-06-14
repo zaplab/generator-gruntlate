@@ -1,8 +1,8 @@
 
 require.config({
     paths: {
-        chai: '../../libs/chai'
-
+        chai: '../../libs/chai',
+        moduleA: ''
     }
 });
 
