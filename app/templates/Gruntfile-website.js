@@ -103,10 +103,9 @@ module.exports = function(grunt) {
                     ]
                 }
             }
-        },
-        <% if (testMocha || htmlBasic) { %>
+        },<% if (testMocha) { %>
+
         copy: {
-            <% if (testMocha) { %><% } %>
             testLibsChai: {
                 nonull: true,
                 src: [
