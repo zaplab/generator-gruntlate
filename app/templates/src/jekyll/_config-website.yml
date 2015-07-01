@@ -1,0 +1,4 @@
+name: <%= projectName %>
+markdown: redcarpet
+pygments: true
+devMode: true
