@@ -226,6 +226,12 @@ module.exports = function(grunt) {
                 preserveComments: 'some',
                 report: 'min'
             },
+            init: {
+                src: [
+                    '<%= distributionPath %>/resources/js/init.js'
+                ],
+                    dest: '<%= distributionPath %>/resources/js/init.js'
+            },
             dist: {
                 src: [
                     '<%= distributionPath %>/resources/js/main.js'
