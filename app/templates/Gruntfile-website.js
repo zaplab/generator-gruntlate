@@ -193,8 +193,7 @@ module.exports = function(grunt) {
                     dest: '<%= distributionPath %>'
                 }
             }
-        },<% } %>
-        <% if (testJsHint) { %>
+        },<% } %><% if (testJsHint) { %>
 
         jshint: {
             options: {
@@ -205,7 +204,7 @@ module.exports = function(grunt) {
                     '<%= sourcePath %>/js/*.js'
                 ]
             }
-        },<% if (featureModernizr) { %>
+        },<% } %><% if (featureModernizr) { %>
 
         modernizr: {
             dist: {
@@ -233,7 +232,7 @@ module.exports = function(grunt) {
                 ],
                 dest: '<%= distributionPath %>/resources/js/main.js'
             }
-        },<% } %>
+        },
 
         sass: {
             options: {
