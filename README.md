@@ -23,6 +23,13 @@ $ grunt serve
 $ grunt watch
 ```
 
+development (default) or production output (for example css compression on/off):
+
+```
+$ grunt --target=prod|production
+$ grunt --target=dev|development
+```
+
 ```
 $ grunt css
 $ grunt images
