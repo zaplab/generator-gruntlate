@@ -365,7 +365,7 @@ module.exports = yeoman.generators.Base.extend({
             }
 
             if (this.testMocha) {
-                bower.devDependencies.chai = '~1.10.0';
+                bower.devDependencies.chai = '~3.0.0';
                 bower.devDependencies.mocha = '~2.1.0';
             }
 
