@@ -110,26 +110,22 @@ module.exports = function(grunt) {
         },<% if (testMocha) { %>
 
         copy: {
-            testLibsChai: {
+            setupTestsChai: {
                 nonull: true,
                 src: [
                     'src/libs/bower/chai/chai.js'
                 ],
                 dest: 'tests/libs/chai.js'
             },
-            testLibsMocha: {
+            setupTestsMocha: {
                 nonull: true,
-                src: [
-                    'src/libs/bower/mocha/mocha.js'
-                ],
-                dest: 'tests/libs/mocha.js'
-            },
-            testLibsMochaCss: {
-                nonull: true,
+                    expand: true,
+                    cwd: 'src/libs/bower/mocha/',
                     src: [
-                    'src/libs/bower/mocha/mocha.css'
+                    'mocha.js',
+                    'mocha.css'
                 ],
-                    dest: 'tests/libs/mocha.css'
+                dest: 'tests/libs'
             },<% if (moduleLoader == "requirejs") { %>
             testLibsRequirejs: {
                 nonull: true,
@@ -337,13 +333,15 @@ module.exports = function(grunt) {
         }
     });
     <% if (testCssLint || testJsHint || testMocha) { %>
-    // Testing
-    <% if (testMocha) { %>grunt.registerTask('install-tests', [
-        'copy:testLibsChai',
-        'copy:testLibsMocha',
-        'copy:testLibsMochaCss'
+    <% if (testMocha) { %>// First setup
+    grunt.registerTask('setup-tests', [
+        'copy:setupTestsMocha',
+        'copy:setupTestsChai'
+    ]);
+    grunt.registerTask('setup', [
+        'setup-tests'
     ]);<% } %>
-
+    // Testing
     grunt.registerTask('test-css', [
         <% if (testCssLint) { %>'csslint:dist'<% } %>
     ]);

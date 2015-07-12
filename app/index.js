@@ -562,7 +562,7 @@ module.exports = yeoman.generators.Base.extend({
             var installInfo = 'To install:\n> ' + chalk.yellow.bold('npm install && bower install');
 
             if (this.testMocha) {
-                installInfo += chalk.yellow.bold('grunt install-tests');
+                installInfo += chalk.yellow.bold('grunt setup');
             }
 
             if (this.htmlJekyll || this.addDocumentation) {
@@ -575,7 +575,7 @@ module.exports = yeoman.generators.Base.extend({
             this.installDependencies({
                 callback: function () {
                     if (this.testMocha) {
-                        this.spawnCommand('grunt', ['install-tests']);
+                        this.spawnCommand('grunt', ['setup']);
                     }
 
                     if (this.htmlJekyll || this.addDocumentation) {
