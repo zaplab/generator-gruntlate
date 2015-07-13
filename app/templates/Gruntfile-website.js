@@ -319,17 +319,7 @@ module.exports = function(grunt) {
                     'modernizr:dist',<% } %>
                     'clean:end'
                 ]
-            }<% if (!addServeTask) { %>,
-            // TODO: Deprecated in favor of Browsersync which needs more evaluating
-            livereload: {
-                options: {
-                    livereload: 1337
-                },
-                files: [
-                    '<%= distributionPath %>/resources/css/main.css',
-                    '<%= distributionPath %>/resources/js/main.js'
-                ]
-            }<% } %>
+            }
         }
     });
     <% if (testCssLint || testJsHint || testMocha) { %>

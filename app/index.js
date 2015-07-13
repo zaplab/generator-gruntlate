@@ -356,7 +356,7 @@ module.exports = yeoman.generators.Base.extend({
                 devDependencies: {}
             };
 
-            if (this.moduleLoader == "requirejs") {
+            if (this.moduleLoader == 'requirejs') {
                 bower.dependencies.requirejs = '~2.1.15';
             }
 
@@ -412,7 +412,7 @@ module.exports = yeoman.generators.Base.extend({
         },
 
         modules: function () {
-            if (this.moduleLoader == "requirejs") {
+            if (this.moduleLoader == 'requirejs') {
                 this.mkdir(this.sourcePath + '/js/config');
 
                 if (this.projectType === 'website') {
@@ -430,10 +430,10 @@ module.exports = yeoman.generators.Base.extend({
                 name: this._.slugify(this.projectName),
                 private: true,
                 version: '0.0.0',
-                "author": {
-                    "name" : "Author Name",
-                    "email" : "author@email",
-                    "url" : "http://www.author.url"
+                author: {
+                    name : 'Author Name',
+                    email : 'author@email',
+                    url : 'http://www.author.url'
                 },
                 dependencies: {},
                 devDependencies: {
@@ -537,7 +537,7 @@ module.exports = yeoman.generators.Base.extend({
                 this.mkdir(this.testsPath + '/unit');
                 this.copy('tests/unit/basic.js', this.testsPath + '/unit/basic.js');
 
-                if (this.moduleLoader == "requirejs") {
+                if (this.moduleLoader == 'requirejs') {
                     this.mkdir(this.testsPath + '/unit/requirejs');
                     this.copy('tests/unit/requirejs/_main.js', this.testsPath + '/unit/requirejs/_main.js');
                     this.copy('tests/unit/requirejs/basic.js', this.testsPath + '/unit/requirejs/basic.js');
