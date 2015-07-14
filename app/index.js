@@ -451,6 +451,9 @@ module.exports = yeoman.generators.Base.extend({
                     'grunt-sass': '^1.0.0',
                     'load-grunt-tasks': '^3.2.0',
                     'time-grunt': '^1.2.1'
+                },
+                scripts: {
+                    postinstall: 'node_modules/.bin/bower install' + (this.testMocha ? ' && node_modules/.bin/grunt setup' : '')
                 }
             };
 
@@ -559,25 +562,18 @@ module.exports = yeoman.generators.Base.extend({
     install: function ()
     {
         if (this.options['skip-install']) {
-            var installInfo = 'To install:\n> ' + chalk.yellow.bold('npm install && bower install');
-
-            if (this.testMocha) {
-                installInfo += chalk.yellow.bold('grunt setup');
-            }
+            var installInfo = 'To install:\n> ' + chalk.yellow.bold('npm install');
 
             if (this.htmlJekyll || this.addDocumentation) {
                 installInfo += chalk.yellow.bold(' && bundler install');
             }
 
             this.log(installInfo);
-            this.log('Then:\n> ' + chalk.yellow.bold('grunt && grunt watch'));
+            // TODO: if serve task
+            this.log('Then:\n> ' + chalk.yellow.bold('grunt serve'));
         } else {
             this.installDependencies({
                 callback: function () {
-                    if (this.testMocha) {
-                        this.spawnCommand('grunt', ['setup']);
-                    }
-
                     if (this.htmlJekyll || this.addDocumentation) {
                         this.spawnCommand('bundler', ['install']);
                     }
