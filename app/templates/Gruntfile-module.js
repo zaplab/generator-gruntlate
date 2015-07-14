@@ -302,7 +302,8 @@ module.exports = function(grunt) {
                 tasks: [
                     'clean:start',
                     'css',<% if (featureModernizr && addDocumentation) { %>
-                    'modernizr:doc',<% } %>
+                    'modernizr:doc',
+                    'concat:initJsDoc',<% } %>
                     'clean:end'
                 ]
             },
@@ -321,7 +322,8 @@ module.exports = function(grunt) {
                 tasks: [
                     'clean:start',
                     'js',<% if (featureModernizr && addDocumentation) { %>
-                    'modernizr:doc',<% } %>
+                    'modernizr:doc',
+                    'concat:initJsDoc',<% } %>
                     'clean:end'
                 ]
             }<% if (!addServeTask) { %>,

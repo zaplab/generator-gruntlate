@@ -297,7 +297,8 @@ module.exports = function(grunt) {
                 tasks: [
                     'clean:start',
                     'css',<% if (featureModernizr) { %>
-                    'modernizr:dist',<% } %>
+                    'modernizr:dist',
+                    'concat:initJs',<% } %>
                     'clean:end'
                 ]
             },
@@ -316,7 +317,8 @@ module.exports = function(grunt) {
                 tasks: [
                     'clean:start',
                     'js',<% if (featureModernizr) { %>
-                    'modernizr:dist',<% } %>
+                    'modernizr:dist',
+                    'concat:initJs',<% } %>
                     'clean:end'
                 ]
             }
