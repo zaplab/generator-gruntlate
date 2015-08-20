@@ -1,6 +1,6 @@
 
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
     'use strict';
 
     require('time-grunt')(grunt);
@@ -12,19 +12,13 @@ module.exports = function(grunt) {
         jsTask;
 
     switch (target) {
-        case 'prod':
-        /* falls through */
-        case 'production':
-        /* falls through */
-        case 'staging':
-            isDevMode = false;
-            break;
         case 'dev':
         /* falls through */
         case 'development':
-        /* falls through */
-        default:
             isDevMode = true;
+            break;
+        default:
+            isDevMode = false;
     }
 
     grunt.initConfig({
@@ -36,7 +30,7 @@ module.exports = function(grunt) {
         ' All rights reserved.\n' +
         ' <%%= pkg.description %>\n' +
         '*/',
-        <% if (addServeTask) { %>
+
         browserSync: {
             dev: {
                 bsFiles: {
@@ -53,7 +47,7 @@ module.exports = function(grunt) {
                 }
             }
         },
-        <% } %>
+
         clean: {
             start: [
                 'tmp'
@@ -79,7 +73,7 @@ module.exports = function(grunt) {
                     '<%= sourcePath %>/libs/bower/requirejs/require.js'<% } %>
                 ],
                 dest: '<%= distributionPath %>/resources/js/init.js'
-            }<% if (moduleLoader != "requirejs") { %>,
+            }<% if (moduleLoader == "none") { %>,
             js: {
                 src: [
                     '<%= sourcePath %>/js/main.js'
@@ -119,9 +113,9 @@ module.exports = function(grunt) {
             },
             setupTestsMocha: {
                 nonull: true,
-                    expand: true,
-                    cwd: 'src/libs/bower/mocha/',
-                    src: [
+                expand: true,
+                cwd: 'src/libs/bower/mocha/',
+                src: [
                     'mocha.js',
                     'mocha.css'
                 ],
@@ -296,9 +290,7 @@ module.exports = function(grunt) {
                 ],
                 tasks: [
                     'clean:start',
-                    'css',<% if (featureModernizr) { %>
-                    'modernizr:dist',
-                    'concat:initJs',<% } %>
+                    'css',
                     'clean:end'
                 ]
             },
@@ -306,7 +298,7 @@ module.exports = function(grunt) {
                 files: [
                     '<%= sourcePath %>/img/**'
                 ],
-                    tasks: [
+                tasks: [
                     'imagemin:dist'
                 ]
             },
@@ -316,9 +308,7 @@ module.exports = function(grunt) {
                 ],
                 tasks: [
                     'clean:start',
-                    'js',<% if (featureModernizr) { %>
-                    'modernizr:dist',
-                    'concat:initJs',<% } %>
+                    'js',
                     'clean:end'
                 ]
             }
@@ -365,7 +355,7 @@ module.exports = function(grunt) {
     grunt.registerTask('css', cssTask);
 
     jsTask = [
-        <% if (moduleLoader == "requirejs") { %>'requirejs:main'<% } else { %>'concat:js'<% } %>,
+        <% if (moduleLoader == "requirejs") { %>'requirejs:main'<% } %><% if (moduleLoader == "none") { %>'concat:js'<% } %>,
         'header:jsDist',<% if (featureModernizr) { %>
         'modernizr:dist',<% } %>
         'concat:initJs'<% if (testJsHint) { %>,
@@ -388,14 +378,14 @@ module.exports = function(grunt) {
         'jekyll',
         'default'
         // TODO: copy js & css to doc path
-    ]);<% } %><% if (addServeTask) { %>
+    ]);<% } %>
 
     grunt.registerTask('serve', [
-        <% if (htmlJekyll) { %>'doc'<% } else {%>'default'<% } %>,
+        <% if (htmlJekyll) { %>'doc'<% } else { %>'default'<% } %>,
         'browserSync',
         'watch'
     ]);
-    <% } %>
+
     // Default task
     grunt.registerTask('default', [
         'clean:start',

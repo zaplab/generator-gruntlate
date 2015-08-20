@@ -1,6 +1,6 @@
 
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
     'use strict';
 
     require('time-grunt')(grunt);
@@ -12,19 +12,13 @@ module.exports = function(grunt) {
         jsTask;
 
     switch (target) {
-        case 'prod':
-        /* falls through */
-        case 'production':
-        /* falls through */
-        case 'staging':
-            isDevMode = false;
-            break;
         case 'dev':
         /* falls through */
         case 'development':
-        /* falls through */
-        default:
             isDevMode = true;
+            break;
+        default:
+            isDevMode = false;
     }
 
     grunt.initConfig({
@@ -36,7 +30,7 @@ module.exports = function(grunt) {
         ' All rights reserved.\n' +
         ' <%%= pkg.description %>\n' +
         '*/',
-        <% if (addServeTask) { %>
+        <% if (addDocumentation) { %>
         browserSync: {
             dev: {
                 bsFiles: {
@@ -301,9 +295,7 @@ module.exports = function(grunt) {
                 ],
                 tasks: [
                     'clean:start',
-                    'css',<% if (featureModernizr && addDocumentation) { %>
-                    'modernizr:doc',
-                    'concat:initJsDoc',<% } %>
+                    'css',
                     'clean:end'
                 ]
             },
@@ -321,22 +313,10 @@ module.exports = function(grunt) {
                 ],
                 tasks: [
                     'clean:start',
-                    'js',<% if (featureModernizr && addDocumentation) { %>
-                    'modernizr:doc',
-                    'concat:initJsDoc',<% } %>
+                    'js',
                     'clean:end'
                 ]
-            }<% if (!addServeTask) { %>,
-            // TODO: Deprecated in favor of Browsersync which needs more evaluating
-            livereload: {
-                options: {
-                    livereload: 1337
-                },
-                files: [
-                    '<%= distributionPath %>/css/main.css',
-                    '<%= distributionPath %>/js/main.js'
-                ]
-            }<% } %>
+            }
         }
     });
     <% if (testCssLint || testJsHint || testMocha) { %>
@@ -402,7 +382,7 @@ module.exports = function(grunt) {
         'jekyll',
         'default'
         // TODO: copy js & css to doc path
-    ]);<% } %><% if (addServeTask) { %>
+    ]);<% } %><% if (addDocumentation) { %>
 
     grunt.registerTask('serve', [
         'doc',

@@ -196,25 +196,6 @@ module.exports = yeoman.generators.Base.extend({
         }
     },
 
-    prompAddServeTask: function ()
-    {
-        if ((this.projectType === 'website') || this.addDocumentation) {
-            var done = this.async();
-
-            this.prompt({
-                type: 'confirm',
-                name: 'serve',
-                message: 'Add Serve Task (BrowserSync)',
-                default: true
-            }, function (answers) {
-                this.addServeTask = answers.serve;
-                this.config.set('addServeTask', this.addServeTask);
-
-                done();
-            }.bind(this));
-        }
-    },
-
     prompTestSettings: function ()
     {
         var done = this.async(),
@@ -473,7 +454,7 @@ module.exports = yeoman.generators.Base.extend({
             //    packageJSON.devDependencies['grunt-webpack'] = '^1.0.8';
             //}
 
-            if (this.addServeTask) {
+            if ((this.projectType === 'website') || this.addDocumentation) {
                 packageJSON.devDependencies['grunt-browser-sync'] = '^2.1.2';
             }
 
@@ -569,8 +550,12 @@ module.exports = yeoman.generators.Base.extend({
             }
 
             this.log(installInfo);
-            // TODO: if serve task
-            this.log('Then:\n> ' + chalk.yellow.bold('grunt serve'));
+
+            if ((this.projectType === 'website') || this.addDocumentation) {
+                this.log('Then:\n> ' + chalk.yellow.bold('grunt serve'));
+            } else {
+                this.log('Then:\n> ' + chalk.yellow.bold('grunt'));
+            }
         } else {
             this.installDependencies({
                 callback: function () {
