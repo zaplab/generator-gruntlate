@@ -1,7 +1,7 @@
 {
   "name": "generator-gruntlate",
-  "version": "0.0.0",
-  "description": "",
+  "version": "0.1.0",
+  "description": "grunt-based project yeoman-generator",
   "author": {
     "name" : "Sebastian Herber",
     "email" : "herber@zaplab.at",
