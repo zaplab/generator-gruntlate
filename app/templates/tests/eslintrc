@@ -1,0 +1,10 @@
+{
+    "extends": "airbnb/base",
+    "rules": {
+        "indent": [2, <% if (indentation == 'tabs') { %>"tabs"<% } else { %><%= indentationSpaces %><% } %>],
+        "space-before-function-paren": [2, {
+            "anonymous": "always",
+            "named": "never"
+        }]
+    }
+}

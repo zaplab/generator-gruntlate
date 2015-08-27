@@ -1,26 +1,28 @@
 
-<% if (moduleLoader == "requirejs") { %>
-(function (root, factory) {
-    'use strict';
-
+<% if (moduleLoader != "none") { %>
+// Immediately-Invoked Function Expression
+(function iife(global, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD
-        define([], function () {
+        define([], function amd() {
             return factory();
         });
     } else if (typeof module !== 'undefined' && module.exports) {
-        // CommonJS
+        // commonjs
         module.exports = factory();
     } else {
-        root.moduleA = factory();
+        global.moduleA = factory();
     }
-}(this, function () {
+}(typeof window !== 'undefined' ? window : this, function factory() {
     return {
-        log: function () {
+        log: function log() {
             console.log('module-a');
-        }
+        },
     };
 }));
 <% } else { %>
-console.log('gruntlate');
+// Immediately-Invoked Function Expression
+(function iife() {
+    console.log('module-a');
+})();
 <% } %>

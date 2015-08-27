@@ -121,6 +121,92 @@ module.exports = yeoman.generators.Base.extend({
         }
     },
 
+    prompSpacesOrTabs: function ()
+    {
+        var done = this.async();
+
+        this.prompt({
+            type: 'list',
+            name: 'indentation',
+            message: 'Indentation',
+            choices: [
+                {
+                    name: 'Spaces',
+                    value: 'spaces'
+                },
+                {
+                    name: 'Tabs',
+                    value: 'tabs'
+                }
+            ],
+            default: 'spaces'
+        }, function (answers) {
+            this.indentation = answers.indentation;
+            this.config.set('indentation', this.indentation);
+
+            done();
+        }.bind(this));
+    },
+
+    prompSpaces: function ()
+    {
+        if (this.indentation === 'spaces') {
+            var done = this.async();
+
+            this.prompt({
+                type: 'input',
+                name: 'indentationSpaces',
+                message: 'Number of spaces',
+                validate: function (input) {
+                    var numberValue = parseInt(input, 10);
+
+                    if (numberValue >= 0) {
+                        return true;
+                    } else {
+                        return 'You need to provide a number';
+                    }
+                }.bind(this),
+                default: 4
+            }, function (answers) {
+                this.indentationSpaces = answers.indentationSpaces;
+                this.config.set('indentationSpaces', this.indentationSpaces);
+
+                done();
+            }.bind(this));
+        }
+    },
+
+    prompJSVersion: function ()
+    {
+        var done = this.async();
+
+        this.prompt({
+            type: 'list',
+            name: 'jsVersion',
+            message: 'JavaScript version',
+            choices: [
+                {
+                    name: 'ES5',
+                    value: 'es5'
+                },
+                {
+                    name: 'ES6',
+                    value: 'es6'
+                }/* TODO: ,
+                {
+                    name: 'ES7',
+                    value: 'es7'
+                }*/
+            ],
+            default: 'es6'
+        }, function (answers) {
+            this.jsVersion = answers.jsVersion;
+            this.config.set('jsVersion', this.jsVersion);
+
+            done();
+        }.bind(this));
+    },
+
     promptSourcePathName: function ()
     {
         var done = this.async();
@@ -196,25 +282,6 @@ module.exports = yeoman.generators.Base.extend({
         }
     },
 
-    prompAddServeTask: function ()
-    {
-        if ((this.projectType === 'website') || this.addDocumentation) {
-            var done = this.async();
-
-            this.prompt({
-                type: 'confirm',
-                name: 'serve',
-                message: 'Add Serve Task (BrowserSync)',
-                default: true
-            }, function (answers) {
-                this.addServeTask = answers.serve;
-                this.config.set('addServeTask', this.addServeTask);
-
-                done();
-            }.bind(this));
-        }
-    },
-
     prompTestSettings: function ()
     {
         var done = this.async(),
@@ -233,8 +300,8 @@ module.exports = yeoman.generators.Base.extend({
                     checked: true
                 },
                 {
-                    name: 'JSHint',
-                    value: 'jshint',
+                    name: 'ESLint',
+                    value: 'eslint',
                     checked: true
                 },
                 {
@@ -247,10 +314,10 @@ module.exports = yeoman.generators.Base.extend({
             var features = answers.tests;
 
             this.testCssLint = hasFeature(features, 'csslint');
-            this.testJsHint = hasFeature(features, 'jshint');
+            this.testESLint = hasFeature(features, 'eslint');
             this.testMocha = hasFeature(features, 'mocha');
             this.config.set('testCssLint', this.testCssLint);
-            this.config.set('testJsHint', this.testJsHint);
+            this.config.set('testESLint', this.testESLint);
             this.config.set('testMocha', this.testMocha);
 
             done();
@@ -259,7 +326,7 @@ module.exports = yeoman.generators.Base.extend({
 
     promptTestsPath: function ()
     {
-        if (this.testCssLint || this.testJsHint || this.testMocha) {
+        if (this.testCssLint || this.testESLint || this.testMocha) {
             var done = this.async();
 
             this.prompt({
@@ -296,13 +363,13 @@ module.exports = yeoman.generators.Base.extend({
                     {
                         name: 'Require.js',
                         value: 'requirejs'
-                    }/*, TODO
+                    },
                     {
                         name: 'Webpack',
                         value: 'webpack'
-                    }*/
+                    }
                 ],
-                default: 'requirejs'
+                default: 'webpack'
             };
 
         this.prompt(prompts, function (answers) {
@@ -356,7 +423,7 @@ module.exports = yeoman.generators.Base.extend({
                 devDependencies: {}
             };
 
-            if (this.moduleLoader == "requirejs") {
+            if (this.moduleLoader == 'requirejs') {
                 bower.dependencies.requirejs = '~2.1.15';
             }
 
@@ -365,7 +432,7 @@ module.exports = yeoman.generators.Base.extend({
             }
 
             if (this.testMocha) {
-                bower.devDependencies.chai = '~1.10.0';
+                bower.devDependencies.chai = '~3.0.0';
                 bower.devDependencies.mocha = '~2.1.0';
             }
 
@@ -405,14 +472,14 @@ module.exports = yeoman.generators.Base.extend({
             }
         },
 
-        jshint: function () {
-            if (this.testJsHint) {
-                this.copy('tests/jshintrc', this.testsPath + '/.jshintrc');
+        eslint: function () {
+            if (this.testESLint) {
+                this.copy('tests/eslintrc', this.testsPath + '/.eslintrc');
             }
         },
 
         modules: function () {
-            if (this.moduleLoader == "requirejs") {
+            if (this.moduleLoader == 'requirejs') {
                 this.mkdir(this.sourcePath + '/js/config');
 
                 if (this.projectType === 'website') {
@@ -430,11 +497,12 @@ module.exports = yeoman.generators.Base.extend({
                 name: this._.slugify(this.projectName),
                 private: true,
                 version: '0.0.0',
-                "author": {
-                    "name" : "Author Name",
-                    "email" : "author@email",
-                    "url" : "http://www.author.url"
+                author: {
+                    name : 'Author Name',
+                    email : 'author@email',
+                    url : 'http://www.author.url'
                 },
+                description: 'project description',
                 dependencies: {},
                 devDependencies: {
                     bower: '^1.4.1',
@@ -443,7 +511,7 @@ module.exports = yeoman.generators.Base.extend({
                     'grunt-contrib-clean': '^0.6.0',
                     'grunt-contrib-concat': '^0.5.1',
                     'grunt-contrib-copy': '^0.8.0',
-                    'grunt-contrib-cssmin': '^0.12.3',
+                    'grunt-contrib-cssmin': '^0.13.0',
                     'grunt-contrib-imagemin': '^0.9.4',
                     'grunt-contrib-uglify': '^0.9.1',
                     'grunt-contrib-watch': '^0.6.1',
@@ -451,6 +519,9 @@ module.exports = yeoman.generators.Base.extend({
                     'grunt-sass': '^1.0.0',
                     'load-grunt-tasks': '^3.2.0',
                     'time-grunt': '^1.2.1'
+                },
+                scripts: {
+                    postinstall: 'node_modules/.bin/bower install' + (this.testMocha ? ' && node_modules/.bin/grunt setup' : '')
                 }
             };
 
@@ -458,25 +529,33 @@ module.exports = yeoman.generators.Base.extend({
                 packageJSON.devDependencies['grunt-contrib-csslint'] = '^0.4.0';
             }
 
-            if (this.testJsHint) {
-                packageJSON.devDependencies['grunt-contrib-jshint'] = '^0.11.2';
+            if (this.testESLint) {
+                packageJSON.devDependencies['babel-eslint'] = '^4.0.10';
+
+                if (this.jsVersion === 'es5') {
+                    packageJSON.devDependencies['eslint-config-airbnb-es5'] = '^1.0.5';
+                } else {
+                    packageJSON.devDependencies['eslint-config-airbnb'] = '^0.0.8';
+                }
+
+                packageJSON.devDependencies['grunt-eslint'] = '^17.1.0';
             }
 
             if (this.moduleLoader == 'requirejs') {
                 packageJSON.devDependencies['grunt-requirejs'] = '^0.4.2';
             }
 
-            //if (this.moduleLoader == 'webpack') {
-            //    packageJSON.devDependencies['grunt-webpack'] = '^1.0.8';
-            //}
+            if (this.moduleLoader == 'webpack') {
+                packageJSON.devDependencies['grunt-webpack'] = '^1.0.11';
+            }
 
-            if (this.addServeTask) {
+            if ((this.projectType === 'website') || this.addDocumentation) {
                 packageJSON.devDependencies['grunt-browser-sync'] = '^2.1.2';
             }
 
             if (this.testMocha) {
                 packageJSON.devDependencies['grunt-contrib-connect'] = '^0.10.1';
-                packageJSON.devDependencies['grunt-mocha'] = '^0.4.12';
+                packageJSON.devDependencies['grunt-mocha'] = '^0.4.13';
             }
 
             if (this.htmlJekyll || this.addDocumentation) {
@@ -537,7 +616,7 @@ module.exports = yeoman.generators.Base.extend({
                 this.mkdir(this.testsPath + '/unit');
                 this.copy('tests/unit/basic.js', this.testsPath + '/unit/basic.js');
 
-                if (this.moduleLoader == "requirejs") {
+                if (this.moduleLoader == 'requirejs') {
                     this.mkdir(this.testsPath + '/unit/requirejs');
                     this.copy('tests/unit/requirejs/_main.js', this.testsPath + '/unit/requirejs/_main.js');
                     this.copy('tests/unit/requirejs/basic.js', this.testsPath + '/unit/requirejs/basic.js');
@@ -559,25 +638,22 @@ module.exports = yeoman.generators.Base.extend({
     install: function ()
     {
         if (this.options['skip-install']) {
-            var installInfo = 'To install:\n> ' + chalk.yellow.bold('npm install && bower install');
-
-            if (this.testMocha) {
-                installInfo += chalk.yellow.bold('grunt install-tests');
-            }
+            var installInfo = 'To install:\n> ' + chalk.yellow.bold('npm install');
 
             if (this.htmlJekyll || this.addDocumentation) {
                 installInfo += chalk.yellow.bold(' && bundler install');
             }
 
             this.log(installInfo);
-            this.log('Then:\n> ' + chalk.yellow.bold('grunt && grunt watch'));
+
+            if ((this.projectType === 'website') || this.addDocumentation) {
+                this.log('Then:\n> ' + chalk.yellow.bold('grunt serve'));
+            } else {
+                this.log('Then:\n> ' + chalk.yellow.bold('grunt'));
+            }
         } else {
             this.installDependencies({
                 callback: function () {
-                    if (this.testMocha) {
-                        this.spawnCommand('grunt', ['install-tests']);
-                    }
-
                     if (this.htmlJekyll || this.addDocumentation) {
                         this.spawnCommand('bundler', ['install']);
                     }

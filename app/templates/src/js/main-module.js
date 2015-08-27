@@ -1,22 +1,36 @@
-<% if (moduleLoader == "requirejs") { %>
-(function (root, factory) {
-    'use strict';
-
+<% if (moduleLoader != "none") { %>
+// Immediately-Invoked Function Expression
+(function iife(global, factory) {
     if (typeof define === 'function' && define.amd) {
-        // AMD.
-        define(['module-a'], function (moduleA) {
-            return factory(moduleA);
+        // AMD
+        define([
+            'module-a',
+        ], function amd(
+            moduleA
+        ) {
+            return factory(
+                moduleA
+            );
         });
     } else if (typeof module !== 'undefined' && module.exports) {
         // commonjs
-        module.exports = factory(require('module-a'));
+        module.exports = factory(
+            require('module-a')
+        );
     } else {
-        root.main = factory(window.moduleA);
+        factory(
+            moduleA
+        );
     }
-}(this, function (moduleA) {
+}(typeof window !== 'undefined' ? window : this, function factory(
+    moduleA
+) {
     console.log('gruntlate');
     moduleA.log();
 }));
 <% } else { %>
-console.log('gruntlate');
+// Immediately-Invoked Function Expression
+(function iife() {
+    console.log('gruntlate');
+})();
 <% } %>
