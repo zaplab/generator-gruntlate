@@ -7,7 +7,6 @@
     "email" : "herber@zaplab.at",
     "url" : "http://www.zaplab.at"
   },
-  "private": true,
   "files": [
     "app"
   ],
