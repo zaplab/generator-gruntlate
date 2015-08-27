@@ -1,4 +1,5 @@
-
+<% if (moduleLoader == "webpack") { %>
+var webpack = require('webpack');<% } %>
 
 module.exports = function (grunt) {
     'use strict';
@@ -9,7 +10,9 @@ module.exports = function (grunt) {
     var isDevMode,
         target = grunt.option('target'),
         cssTask,
-        jsTask;
+        cssWatchTask,
+        jsTask,
+        jsWatchTask;
 
     switch (target) {
         case 'dev':
@@ -30,6 +33,17 @@ module.exports = function (grunt) {
         ' All rights reserved.\n' +
         ' <%%= pkg.description %>\n' +
         '*/',
+        <% if (moduleLoader == "none") { %>
+        babel: {
+            options: {
+                sourceMap: isDevMode,
+            },
+            dist: {
+                files: {
+                    '<%= distributionPath %>/js/main.js': 'tmp/js/main.js',
+                }
+            }
+        },<% } %>
 
         browserSync: {
             dev: {
@@ -38,45 +52,45 @@ module.exports = function (grunt) {
                         '<%= distributionPath %>/resources/css/*.css',
                         '<%= distributionPath %>/resources/img/**',
                         '<%= distributionPath %>/resources/js/*.js',
-                        '<%= distributionPath %>/*.html'
+                        '<%= distributionPath %>/*.html',
                     ]
                 },
                 options: {
                     watchTask: true,
-                    server: './<%= distributionPath %>'
+                    server: './<%= distributionPath %>',
                 }
             }
         },
 
         clean: {
             start: [
-                'tmp'
+                'tmp',
             ],
             dist: [
                 '<%= distributionPath %>/resources/css',
                 '<%= distributionPath %>/resources/img',
-                '<%= distributionPath %>/resources/js'
+                '<%= distributionPath %>/resources/js',
             ],
             end: [
-                'tmp'
+                'tmp',
             ]
         },
 
         concat: {
             options: {
                 sourceMap: isDevMode,
-                stripBanners: true
+                stripBanners: true,
             },
             initJs: {
                 src: [<% if (featureModernizr) { %>
-                    'tmp/js/modernizr.js'<% } %><% if (moduleLoader == "requirejs") { %><% if (featureModernizr) { %>,<% } %>
-                    '<%= sourcePath %>/libs/bower/requirejs/require.js'<% } %>
+                    'tmp/js/modernizr.js',<% } %><% if (moduleLoader == "requirejs") { %>
+                    '<%= sourcePath %>/libs/bower/requirejs/require.js',<% } %>
                 ],
                 dest: '<%= distributionPath %>/resources/js/init.js'
             }<% if (moduleLoader == "none") { %>,
             js: {
                 src: [
-                    '<%= sourcePath %>/js/main.js'
+                    '<%= sourcePath %>/js/main.js',
                 ],
                 dest: '<%= distributionPath %>/resources/js/main.js'
             }<% } %>
@@ -85,10 +99,10 @@ module.exports = function (grunt) {
         csslint: {
             dist: {
                 options: {
-                    csslintrc: '<%= testsPath %>/.csslintrc'
+                    csslintrc: '<%= testsPath %>/.csslintrc',
                 },
                 src: [
-                    '<%= distributionPath %>/resources/css/main.css'
+                    '<%= distributionPath %>/resources/css/main.css',
                 ]
             }
         },<% } %>
@@ -97,7 +111,7 @@ module.exports = function (grunt) {
             dist: {
                 files: {
                     '<%= distributionPath %>/resources/css/main.css': [
-                        '<%= distributionPath %>/resources/css/main.css'
+                        '<%= distributionPath %>/resources/css/main.css',
                     ]
                 }
             }
@@ -107,7 +121,7 @@ module.exports = function (grunt) {
             setupTestsChai: {
                 nonull: true,
                 src: [
-                    'src/libs/bower/chai/chai.js'
+                    'src/libs/bower/chai/chai.js',
                 ],
                 dest: 'tests/libs/chai.js'
             },
@@ -117,21 +131,21 @@ module.exports = function (grunt) {
                 cwd: 'src/libs/bower/mocha/',
                 src: [
                     'mocha.js',
-                    'mocha.css'
+                    'mocha.css',
                 ],
                 dest: 'tests/libs'
             },<% if (moduleLoader == "requirejs") { %>
             testLibsRequirejs: {
                 nonull: true,
                 src: [
-                    'src/libs/bower/requirejs/require.js'
+                    'src/libs/bower/requirejs/require.js',
                 ],
                 dest: 'tests/libs/require.js'
             },<% } %>
             testDist: {
                 nonull: true,
                 src: [
-                    '<%= distributionPath %>/resources/js/main.js'
+                    '<%= distributionPath %>/resources/js/main.js',
                 ],
                 dest: '<%= testsPath %>/dist/js/main.js'
             }
@@ -140,7 +154,7 @@ module.exports = function (grunt) {
         header: {
             cssDist: {
                 options: {
-                    text: isDevMode ? '' : '<%%= banner %>'
+                    text: '<%%= banner %>',
                 },
                 files: {
                     '<%= distributionPath %>/resources/css/main.css': '<%= distributionPath %>/resources/css/main.css'
@@ -148,7 +162,7 @@ module.exports = function (grunt) {
             },
             jsDist: {
                 options: {
-                    text: isDevMode ? '' : '<%%= banner %>'
+                    text: '<%%= banner %>',
                 },
                 files: {
                     '<%= distributionPath %>/resources/js/main.js': '<%= distributionPath %>/resources/js/main.js'
@@ -158,42 +172,40 @@ module.exports = function (grunt) {
 
         imagemin: {
             options: {
-                pngquant: true
+                pngquant: true,
             },
             dist: {
                 files: [{
                     expand: true,
                     cwd: '<%= sourcePath %>/img/',
                     src: [
-                        '**/*.{png,jpg,gif}'
+                        '**/*.{png,jpg,gif,svg}',
                     ],
-                    dest: '<%= distributionPath %>/resources/img/'
+                    dest: '<%= distributionPath %>/resources/img/',
                 }]
             }
         },<% if (htmlJekyll) { %>
 
         jekyll: {
             options: {
-                bundleExec: true
+                bundleExec: true,
             },
             doc: {
                 options: {
                     raw: 'devMode: ' + (isDevMode ? 'true' : 'false'),
                     src: '<%= sourcePath %>/jekyll',
-                    dest: '<%= distributionPath %>'
+                    dest: '<%= distributionPath %>',
                 }
             }
-        },<% } %><% if (testJsHint) { %>
+        },<% } %><% if (testESLint) { %>
 
-        jshint: {
+        eslint: {
             options: {
-                jshintrc: '<%= testsPath %>/.jshintrc'
+                configFile: '<%= testsPath %>/.eslintrc',
             },
-            dist: {
-                src: [
-                    '<%= sourcePath %>/js/*.js'
-                ]
-            }
+            src: [
+                '<%= sourcePath %>/js/*.js'
+            ]
         },<% } %><% if (featureModernizr) { %>
 
         modernizr: {
@@ -205,7 +217,7 @@ module.exports = function (grunt) {
                 files: {
                     src: [
                         '<%= distributionPath %>/resources/js/**/*',
-                        '<%= distributionPath %>/resources/css/**/*'
+                        '<%= distributionPath %>/resources/css/**/*',
                     ]
                 }
             }
@@ -214,17 +226,17 @@ module.exports = function (grunt) {
         uglify: {
             options: {
                 preserveComments: 'some',
-                report: 'min'
+                report: 'min',
             },
             init: {
                 src: [
-                    '<%= distributionPath %>/resources/js/init.js'
+                    '<%= distributionPath %>/resources/js/init.js',
                 ],
-                    dest: '<%= distributionPath %>/resources/js/init.js'
+                dest: '<%= distributionPath %>/resources/js/init.js'
             },
             dist: {
                 src: [
-                    '<%= distributionPath %>/resources/js/main.js'
+                    '<%= distributionPath %>/resources/js/main.js',
                 ],
                 dest: '<%= distributionPath %>/resources/js/main.js'
             }
@@ -233,11 +245,11 @@ module.exports = function (grunt) {
         sass: {
             options: {
                 outputStyle: isDevMode ? 'expanded' : 'compressed',
-                sourceMap: isDevMode
+                sourceMap: isDevMode,
             },
             dist: {
                 files: {
-                    '<%= distributionPath %>/resources/css/main.css': '<%= sourcePath %>/css/main.scss'
+                    '<%= distributionPath %>/resources/css/main.css': '<%= sourcePath %>/css/main.scss',
                 }
             }
         },
@@ -247,25 +259,25 @@ module.exports = function (grunt) {
             testServer: {
                 options: {
                     hostname: 'localhost',
-                        port: 8080,
-                        base: 'tests/'
+                    port: 8080,
+                    base: 'tests/',
                 }
             }
         },
 
         mocha: {
             options: {
-                run: true
+                run: true,
             },<% if (moduleLoader == "requirejs") { %>
             dist: {
                 options: {
                     run: false,
-                    urls: ['http://localhost:8080/tests.html']
+                    urls: ['http://localhost:8080/tests.html'],
                 }
             }<% } else { %>
             dist: {
                 options: {
-                    urls: ['http://localhost:8080/tests.html']
+                    urls: ['http://localhost:8080/tests.html'],
                 }
             }<% } %>
         },<% } %><% if (moduleLoader == "requirejs") { %>
@@ -278,112 +290,154 @@ module.exports = function (grunt) {
                     mainConfigFile: '<%= sourcePath %>/js/config/requirejs.js',
                     name: '<%= sourcePath %>/js/main.js',
                     out: '<%= distributionPath %>/resources/js/main.js',
-                    include: []
+                    include: [],
                 }
+            }
+        },<% } %><% if (moduleLoader == "webpack") { %>
+
+        webpack: {
+            dist: {
+                context: './',
+                entry: '<%= sourcePath %>/js/main.js',
+                output: {
+                    path: '<%= distributionPath %>/resources/js/',
+                    filename: 'main.js',
+                },
+                resolve: {
+                    root: './',
+
+                    // Directory names to be searched for modules
+                    modulesDirectories: [
+                        '<%= sourcePath %>/js',
+                        '<%= sourcePath %>/libs/bower',
+                        'node_modules',
+                    ]
+                },
+                plugins: [
+                    new webpack.ResolverPlugin(
+                        new webpack.ResolverPlugin.DirectoryDescriptionFilePlugin('bower.json', ['main'])
+                    )
+                ],
+                devtool: isDevMode ? 'sourcemap' : ''
             }
         },<% } %>
 
         watch: {
             css: {
                 files: [
-                    '<%= sourcePath %>/css/**'
+                    '<%= sourcePath %>/css/**',
                 ],
                 tasks: [
                     'clean:start',
-                    'css',
-                    'clean:end'
+                    'css:watch',
+                    'clean:end',
                 ]
             },
             img: {
                 files: [
-                    '<%= sourcePath %>/img/**'
+                    '<%= sourcePath %>/img/**',
                 ],
                 tasks: [
-                    'imagemin:dist'
+                    'imagemin:dist',
                 ]
             },
             js: {
                 files: [
-                    '<%= sourcePath %>/js/**'
+                    '<%= sourcePath %>/js/**',
                 ],
                 tasks: [
                     'clean:start',
-                    'js',
-                    'clean:end'
+                    'js:watch',
+                    'clean:end',
                 ]
             }
         }
     });
-    <% if (testCssLint || testJsHint || testMocha) { %>
+    <% if (testCssLint || testESLint || testMocha) { %>
     <% if (testMocha) { %>// First setup
     grunt.registerTask('setup-tests', [
         'copy:setupTestsMocha',
-        'copy:setupTestsChai'
+        'copy:setupTestsChai',
     ]);
     grunt.registerTask('setup', [
-        'setup-tests'
+        'setup-tests',
     ]);<% } %>
     // Testing
     grunt.registerTask('test-css', [
-        <% if (testCssLint) { %>'csslint:dist'<% } %>
+        <% if (testCssLint) { %>'csslint:dist',<% } %>
     ]);
     grunt.registerTask('test-js', [
-        <% if (testJsHint) { %>'jshint:dist'<% if (testMocha) { %>,<% } %><% } %><% if (testMocha) { %><% if (moduleLoader == "requirejs") { %>
+        <% if (testESLint) { %>'eslint:src',<% } %><% if (testMocha) { %><% if (moduleLoader == "requirejs") { %>
         'copy:testLibsRequirejs',<% } %>
         'copy:testDist',
         'connect:testServer',
-        'mocha:dist'<% } %>
+        'mocha:dist',<% } %>
     ]);
     grunt.registerTask('test', [
         'test-css',
-        'test-js'
+        'test-js',
     ]);<% } %>
 
     cssTask = [
-        'sass:dist',
-        <% if (testCssLint) { %>'test-css'<% } %><% if (projectType == 'module') { %>,
-        'cssmin:dist'<% } %>
+        'sass:dist',<% if (testCssLint) { %>
+        'test-css',<% } %>
     ];
 
-    <% if (projectType != 'module') { %>if (!isDevMode) {
-        cssTask.push('cssmin:dist');
-    }<% } %>
+    cssWatchTask = [
+        'sass:dist',<% if (testCssLint) { %>
+        'csslint:dist',<% } %>
+    ];
 
-    cssTask.push('header:cssDist');
+    if (!isDevMode) {
+        cssTask.push('header:cssDist');
+        cssTask.push('cssmin:dist');
+        cssWatchTask = cssTask;
+    }
 
     // CSS
     grunt.registerTask('css', cssTask);
+    grunt.registerTask('css:watch', cssWatchTask);
 
-    jsTask = [
-        <% if (moduleLoader == "requirejs") { %>'requirejs:main'<% } %><% if (moduleLoader == "none") { %>'concat:js'<% } %>,
-        'header:jsDist',<% if (featureModernizr) { %>
+    jsTask = [<% if (moduleLoader == "requirejs") { %>
+        'requirejs:main',<% } %><% if (moduleLoader == "webpack") { %>
+        'webpack:dist',<% } %><% if (moduleLoader == "none") { %>
+        'concat:js',<% } %><% if (featureModernizr) { %>
         'modernizr:dist',<% } %>
-        'concat:initJs'<% if (testJsHint) { %>,
-        'test-js'<% } %>
+        'concat:initJs',<% if (testESLint) { %>
+        'test-js',<% } %>
+    ];
+
+    jsWatchTask = [
+        'eslint:src',<% if (moduleLoader == "none") { %>
+        'concat:js',
+        'babel:dist',<% } %><% if (moduleLoader == "webpack") { %>
+        'webpack:dist',<% } %>
     ];
 
     if (!isDevMode) {
         jsTask.push('uglify');
+        jsTask.push('header:jsDist');
+        jsWatchTask = jsTask;
     }
 
     // JS
     grunt.registerTask('js', jsTask);
+    grunt.registerTask('js:watch', jsWatchTask);
 
     // Images
     grunt.registerTask('images', [
-        'imagemin:dist'
+        'imagemin:dist',
     ]);<% if (htmlJekyll) { %>
 
     grunt.registerTask('doc', [
         'jekyll',
-        'default'
-        // TODO: copy js & css to doc path
+        'default',
     ]);<% } %>
 
     grunt.registerTask('serve', [
         <% if (htmlJekyll) { %>'doc'<% } else { %>'default'<% } %>,
         'browserSync',
-        'watch'
+        'watch',
     ]);
 
     // Default task
@@ -393,6 +447,6 @@ module.exports = function (grunt) {
         'css',
         'js',
         'images',
-        'clean:end'
+        'clean:end',
     ]);
 };

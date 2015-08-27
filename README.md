@@ -81,7 +81,7 @@ get a dummy html template (index.html) in dist
 └── package.json
 ```
 
-or instead of the dummy index.html you can also use a dummy jekyll.
+or instead of the dummy index.html you can also use a dummy jekyll project.
 the following folders / files will be added
 
 ```
