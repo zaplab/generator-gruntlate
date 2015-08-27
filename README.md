@@ -72,7 +72,7 @@ get a dummy html template (index.html) in dist
 │       └── bower
 ├── tests
 │   ├── .csslintrc
-│   └── .jshintrc
+│   └── .eshintrc
 ├── .bowerrc
 ├── .editorconfig
 ├── .gitignore
@@ -121,7 +121,7 @@ the following folders / files will be added
 │       └── bower
 ├── tests
 │   ├── .csslintrc
-│   └── .jshintrc
+│   └── .eshintrc
 ├── .bowerrc
 ├── .editorconfig
 ├── .gitignore
