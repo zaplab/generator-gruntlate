@@ -481,12 +481,7 @@ module.exports = yeoman.generators.Base.extend({
         modules: function () {
             if (this.moduleLoader == 'requirejs') {
                 this.mkdir(this.sourcePath + '/js/config');
-
-                if (this.projectType === 'website') {
-                    this.copy('src/js/config/requirejs-website.js', this.sourcePath + '/js/config/requirejs.js');
-                } else {
-                    this.copy('src/js/config/requirejs-module.js', this.sourcePath + '/js/config/requirejs.js');
-                }
+                this.copy('src/js/config/requirejs.js', this.sourcePath + '/js/config/requirejs.js');
             }
 
             this.copy('src/js/module-a.js', this.sourcePath + '/js/module-a.js');
@@ -546,6 +541,10 @@ module.exports = yeoman.generators.Base.extend({
             }
 
             if (this.moduleLoader == 'webpack') {
+                if (this.jsVersion !== 'es5') {
+                    packageJSON.devDependencies['babel-loader'] = '^5.3.2';
+                }
+
                 packageJSON.devDependencies['grunt-webpack'] = '^1.0.11';
             }
 
@@ -576,12 +575,7 @@ module.exports = yeoman.generators.Base.extend({
             this.mkdir(this.sourcePath + '/img');
             this.mkdir(this.sourcePath + '/js');
 
-            if (this.projectType === 'website') {
-                this.copy('src/js/main-website.js', this.sourcePath + '/js/main.js');
-            } else {
-                this.copy('src/js/main-module.js', this.sourcePath + '/js/main.js');
-            }
-
+            this.copy('src/js/main.js', this.sourcePath + '/js/main.js');
             this.copy('src/css/_functions.scss', this.sourcePath + '/css/_functions.scss');
             this.copy('src/css/_mixins.scss', this.sourcePath + '/css/_mixins.scss');
             this.copy('src/css/_variables.scss', this.sourcePath + '/css/_variables.scss');
@@ -606,7 +600,7 @@ module.exports = yeoman.generators.Base.extend({
                 if (this.htmlJekyll) {
                     this.copy('src/jekyll/_config-website.yml', this.sourcePath + '/jekyll/_config.yml');
                 } else {
-                    this.copy('src/jekyll/_config.yml', this.sourcePath + '/jekyll/_config.yml');
+                    this.copy('src/jekyll/_config-module.yml', this.sourcePath + '/jekyll/_config.yml');
                 }
             }
         },

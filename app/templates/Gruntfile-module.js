@@ -34,7 +34,7 @@ module.exports = function (grunt) {
         ' Copyright <%%= grunt.template.today("yyyy") %> <%%= pkg.author.name %> (<%%= pkg.author.url %>)\n' +
         ' All rights reserved.\n' +
         ' <%%= pkg.description %>\n' +
-        '*/',<% if (moduleLoader == "none") { %>
+        '*/',<% if ((moduleLoader == "none") && (jsVersion != "es5")) { %>
 
         babel: {
             options: {
@@ -42,11 +42,16 @@ module.exports = function (grunt) {
             },
             dist: {
                 files: {
-                    '<%= distributionPath %>/js/main.js': 'tmp/js/main.js',
+                    '<%= distributionPath %>/js/main.js': '<%= distributionPath %>/js/main.js',
+                }
+            },
+            doc: {
+                files: {
+                    '<%= documentationPath %>/resources/js/main.js': 'tmp/js/main.js',
                 }
             }
-        },<% } %>
-        <% if (addDocumentation) { %>
+        },<% } %><% if (addDocumentation) { %>
+
         browserSync: {
             dev: {
                 bsFiles: {
@@ -83,25 +88,27 @@ module.exports = function (grunt) {
             options: {
                 sourceMap: isDevMode,
                 stripBanners: true,
-            },<% if (addDocumentation && featureModernizr && (moduleLoader == "requirejs")) { %>
+            },<% if (addDocumentation && (featureModernizr || (moduleLoader == "requirejs"))) { %>
             initJsDoc: {
                 src: [<% if (featureModernizr) { %>
                     'tmp/js/modernizr.js',<% } %><% if (moduleLoader == "requirejs") { %>
                     '<%= sourcePath %>/libs/bower/requirejs/require.js',<% } %>
                 ],
-                dest: '<%= documentationPath %>/js/init.js'
+                dest: '<%= documentationPath %>/resources/js/init.js'
             },<% } %><% if (moduleLoader == "none") { %>
             jsDist: {
                 src: [
+                    '<%= sourcePath %>/js/module-a.js',
                     '<%= sourcePath %>/js/main.js',
                 ],
                 dest: '<%= distributionPath %>/js/main.js'
             },
             jsDoc: {
                 src: [
+                    '<%= sourcePath %>/js/module-a.js',
                     '<%= sourcePath %>/js/main.js',
                 ],
-                    dest: '<%= distributionPath %>/js/main.js'
+                dest: <% if (jsVersion != "es5") { %>'tmp/js/main.js'<% } else { %>'<%= documentationPath %>/resources/js/main.js'<% } %>
             }<% } %>
         },<% if (testCssLint) { %>
 
@@ -305,7 +312,7 @@ module.exports = function (grunt) {
                         '<%= documentationPath %>/resources/css/**/*',
                     ]
                 }
-            }
+            },
         },
         <% } %>
         uglify: {
@@ -323,8 +330,14 @@ module.exports = function (grunt) {
                 src: [
                     '<%= documentationPath %>/resources/js/main.js',
                 ],
-                    dest: '<%= documentationPath %>/resources/js/main.js'
-            }
+                dest: '<%= documentationPath %>/resources/js/main.js'
+            },<% if (addDocumentation && (featureModernizr || (moduleLoader == "requirejs"))) { %>
+            docInit: {
+                src: [
+                    '<%= documentationPath %>/resources/js/init.js',
+                ],
+                dest: '<%= documentationPath %>/resources/js/init.js'
+            },<% } %>
         },
 
         sass: {
@@ -399,11 +412,20 @@ module.exports = function (grunt) {
         webpack: {
             dist: {
                 context: './',
-                    entry: '<%= sourcePath %>/js/main.js',
-                    output: {
+                entry: '<%= sourcePath %>/js/main.js',
+                output: {
                     path: '<%= distributionPath %>/js/',
                     filename: 'main.js'
-                },
+                },<% if (jsVersion != "es5") { %>
+                module: {
+                    loaders: [
+                        {
+                            test: /\.js?$/,
+                            exclude: /(node_modules|<%= sourcePath %>\/libs\/bower)/,
+                            loader: 'babel-loader',
+                        }
+                    ]
+                },<% } %>
                 resolve: {
                     root: './',
                     modulesDirectories: [
@@ -421,14 +443,23 @@ module.exports = function (grunt) {
             },
             doc: {
                 context: './',
-                    entry: '<%= sourcePath %>/js/main.js',
-                    output: {
+                entry: '<%= sourcePath %>/js/main.js',
+                output: {
                     path: '<%= documentationPath %>/resources/js/',
                     filename: 'main.js'
-                },
+                },<% if (jsVersion != "es5") { %>
+                module: {
+                    loaders: [
+                        {
+                            test: /\.js?$/,
+                            exclude: /(node_modules|<%= sourcePath %>\/libs\/bower)/,
+                            loader: 'babel-loader',
+                        }
+                    ]
+                },<% } %>
                 resolve: {
                     root: './',
-                        modulesDirectories: [
+                    modulesDirectories: [
                         '<%= sourcePath %>/js',
                         '<%= sourcePath %>/libs/bower',
                         'node_modules'
@@ -439,7 +470,7 @@ module.exports = function (grunt) {
                         new webpack.ResolverPlugin.DirectoryDescriptionFilePlugin('bower.json', ['main'])
                     )
                 ],
-                    devtool: isDevMode ? 'sourcemap' : ''
+                devtool: isDevMode ? 'sourcemap' : ''
             }
         },<% } %>
 
@@ -520,7 +551,7 @@ module.exports = function (grunt) {
         cssDocTask.push('header:cssDoc');
         cssDocTask.push('cssmin:doc');
 
-        cssWatchTask = cssTask;
+        cssWatchTask = cssDocTask;
     }
 
     // CSS
@@ -531,7 +562,8 @@ module.exports = function (grunt) {
     jsTask = [<% if (moduleLoader == "requirejs") { %>
         'requirejs:dist',<% } %><% if (moduleLoader == "webpack") { %>
         'webpack:dist',<% } %><% if (moduleLoader == "none") { %>
-        'concat:jsDist',<% } %><% if (testESLint) { %>
+        'concat:jsDist',<% } %><% if ((moduleLoader == "none") && (jsVersion != "es5")) { %>
+        'babel:dist',<% } %><% if (testESLint) { %>
         'test-js',<% } %>
     ];
 
@@ -539,8 +571,9 @@ module.exports = function (grunt) {
         'eslint:src',<% } %><% if (moduleLoader == "requirejs") { %>
         'requirejs:doc',<% } %><% if (moduleLoader == "webpack") { %>
         'webpack:doc',<% } %><% if (moduleLoader == "none") { %>
-        'concat:jsDoc',<% } %><% if (featureModernizr && addDocumentation) { %>
-        'modernizr:doc',<% } %><% if (addDocumentation && featureModernizr && (moduleLoader == "requirejs")) { %>
+        'concat:jsDoc',<% } %><% if ((moduleLoader == "none") && (jsVersion != "es5")) { %>
+        'babel:doc',<% } %><% if (featureModernizr && addDocumentation) { %>
+        'modernizr:doc',<% } %><% if (addDocumentation && (featureModernizr || (moduleLoader == "requirejs"))) { %>
         'concat:initJsDoc',<% } %>
     ];
 
@@ -548,7 +581,7 @@ module.exports = function (grunt) {
         'eslint:src',<% } %><% if (moduleLoader == "requirejs") { %>
         'requirejs:doc',<% } %><% if (moduleLoader == "webpack") { %>
         'webpack:doc',<% } %><% if (moduleLoader == "none") { %>
-        'concat:jsDoc',
+        'concat:jsDoc',<% } %><% if ((moduleLoader == "none") && (jsVersion != "es5")) { %>
         'babel:doc',<% } %>
     ];
 
@@ -558,8 +591,9 @@ module.exports = function (grunt) {
 
         jsDocTask.push('header:jsDoc');
         jsDocTask.push('uglify:doc');
+        jsDocTask.push('uglify:docInit');
 
-        jsWatchTask = jsTask;
+        jsWatchTask = jsDocTask;
     }
 
     // JS
