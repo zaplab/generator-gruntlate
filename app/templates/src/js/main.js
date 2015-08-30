@@ -1,4 +1,4 @@
-<% if (moduleLoader != "none") { %>
+
 // Immediately-Invoked Function Expression
 (function iife(global, factory) {
     if (typeof define === 'function' && define.amd) {
@@ -28,9 +28,3 @@
     console.log('gruntlate');
     moduleA.log();
 }));
-<% } else { %>
-// Immediately-Invoked Function Expression
-(function iife() {
-    console.log('gruntlate');
-})();
-<% } %>

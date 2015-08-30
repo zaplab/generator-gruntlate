@@ -1,5 +1,4 @@
 
-<% if (moduleLoader != "none") { %>
 // Immediately-Invoked Function Expression
 (function iife(global, factory) {
     if (typeof define === 'function' && define.amd) {
@@ -20,9 +19,3 @@
         },
     };
 }));
-<% } else { %>
-// Immediately-Invoked Function Expression
-(function iife() {
-    console.log('module-a');
-})();
-<% } %>

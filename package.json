@@ -1,6 +1,6 @@
 {
   "name": "generator-gruntlate",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "grunt-based project yeoman-generator",
   "author": {
     "name" : "Sebastian Herber",

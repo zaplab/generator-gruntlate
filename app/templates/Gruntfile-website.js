@@ -32,8 +32,8 @@ module.exports = function (grunt) {
         ' Copyright <%%= grunt.template.today("yyyy") %> <%%= pkg.author.name %> (<%%= pkg.author.url %>)\n' +
         ' All rights reserved.\n' +
         ' <%%= pkg.description %>\n' +
-        '*/',
-        <% if (moduleLoader == "none") { %>
+        '*/',<% if ((moduleLoader == "none") && (jsVersion != "es5")) { %>
+
         babel: {
             options: {
                 sourceMap: isDevMode,
@@ -80,19 +80,20 @@ module.exports = function (grunt) {
             options: {
                 sourceMap: isDevMode,
                 stripBanners: true,
-            },
+            },<% if (featureModernizr || (moduleLoader == "requirejs")) { %>
             initJs: {
                 src: [<% if (featureModernizr) { %>
                     'tmp/js/modernizr.js',<% } %><% if (moduleLoader == "requirejs") { %>
                     '<%= sourcePath %>/libs/bower/requirejs/require.js',<% } %>
                 ],
                 dest: '<%= distributionPath %>/resources/js/init.js'
-            }<% if (moduleLoader == "none") { %>,
+            }<% } %><% if (moduleLoader == "none") { %>,
             js: {
                 src: [
+                    '<%= sourcePath %>/js/module-a.js',
                     '<%= sourcePath %>/js/main.js',
                 ],
-                dest: '<%= distributionPath %>/resources/js/main.js'
+                dest: <% if (jsVersion != "es5") { %>'tmp/js/main.js'<% } else { %>'<%= distributionPath %>/resources/js/main.js'<% } %>
             }<% } %>
         },<% if (testCssLint) { %>
 
@@ -302,11 +303,18 @@ module.exports = function (grunt) {
                 output: {
                     path: '<%= distributionPath %>/resources/js/',
                     filename: 'main.js',
-                },
+                },<% if (jsVersion != "es5") { %>
+                module: {
+                    loaders: [
+                        {
+                            test: /\.js?$/,
+                            exclude: /(node_modules|<%= sourcePath %>\/libs\/bower)/,
+                            loader: 'babel-loader',
+                        }
+                    ]
+                },<% } %>
                 resolve: {
                     root: './',
-
-                    // Directory names to be searched for modules
                     modulesDirectories: [
                         '<%= sourcePath %>/js',
                         '<%= sourcePath %>/libs/bower',
@@ -401,15 +409,16 @@ module.exports = function (grunt) {
     jsTask = [<% if (moduleLoader == "requirejs") { %>
         'requirejs:main',<% } %><% if (moduleLoader == "webpack") { %>
         'webpack:dist',<% } %><% if (moduleLoader == "none") { %>
-        'concat:js',<% } %><% if (featureModernizr) { %>
-        'modernizr:dist',<% } %>
-        'concat:initJs',<% if (testESLint) { %>
+        'concat:js',<% } %><% if ((moduleLoader == "none") && (jsVersion != "es5")) { %>
+        'babel:dist',<% } %><% if (featureModernizr) { %>
+        'modernizr:dist',<% } %><% if (featureModernizr || (moduleLoader == "requirejs")) { %>
+        'concat:initJs',<% } %><% if (testESLint) { %>
         'test-js',<% } %>
     ];
 
     jsWatchTask = [
         'eslint:src',<% if (moduleLoader == "none") { %>
-        'concat:js',
+        'concat:js',<% } %><% if ((moduleLoader == "none") && (jsVersion != "es5")) { %>
         'babel:dist',<% } %><% if (moduleLoader == "webpack") { %>
         'webpack:dist',<% } %>
     ];
@@ -427,15 +436,10 @@ module.exports = function (grunt) {
     // Images
     grunt.registerTask('images', [
         'imagemin:dist',
-    ]);<% if (htmlJekyll) { %>
-
-    grunt.registerTask('doc', [
-        'jekyll',
-        'default',
-    ]);<% } %>
+    ]);
 
     grunt.registerTask('serve', [
-        <% if (htmlJekyll) { %>'doc'<% } else { %>'default'<% } %>,
+        'default',
         'browserSync',
         'watch',
     ]);
@@ -443,7 +447,8 @@ module.exports = function (grunt) {
     // Default task
     grunt.registerTask('default', [
         'clean:start',
-        'clean:dist',
+        'clean:dist',<% if (htmlJekyll) { %>
+        'jekyll',<% } %>
         'css',
         'js',
         'images',
