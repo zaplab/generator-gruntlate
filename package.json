@@ -1,6 +1,6 @@
 {
   "name": "generator-gruntlate",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "grunt-based project yeoman-generator",
   "author": {
     "name" : "Sebastian Herber",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/zaplab/gruntlate.git"
+    "url": "https://github.com/zaplab/generator-gruntlate.git"
   },
   "files": [
     "app"
