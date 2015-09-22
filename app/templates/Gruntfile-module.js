@@ -1,6 +1,6 @@
 <% if (moduleLoader == "webpack") { %>
-var webpack = require('webpack');<% } %>
-
+var webpack = require('webpack');
+<% } %>
 module.exports = function (grunt) {
     'use strict';
 
@@ -18,7 +18,7 @@ module.exports = function (grunt) {
 
     switch (target) {
         case 'dev':
-        /* falls through */
+            /* falls through */
         case 'development':
             isDevMode = true;
             break;
@@ -44,12 +44,12 @@ module.exports = function (grunt) {
                 files: {
                     '<%= distributionPath %>/js/main.js': '<%= distributionPath %>/js/main.js',
                 }
-            },
+            },<% if (addDocumentation) { %>
             doc: {
                 files: {
                     '<%= documentationPath %>/resources/js/main.js': 'tmp/js/main.js',
                 }
-            }
+            }<% } %>
         },<% } %><% if (addDocumentation) { %>
 
         browserSync: {
@@ -59,7 +59,7 @@ module.exports = function (grunt) {
                         '<%= documentationPath %>/resources/css/*.css',
                         '<%= documentationPath %>/resources/img/**',
                         '<%= documentationPath %>/resources/js/*.js',
-                        '<%= documentationPath %>/*/*.html',
+                        '<%= documentationPath %>/**/*.html',
                     ]
                 },
                 options: {
@@ -67,8 +67,8 @@ module.exports = function (grunt) {
                     server: './<%= documentationPath %>',
                 }
             }
-        },
-        <% } %>
+        },<% } %>
+
         clean: {
             start: [
                 'tmp',
@@ -102,33 +102,23 @@ module.exports = function (grunt) {
                     '<%= sourcePath %>/js/main.js',
                 ],
                 dest: '<%= distributionPath %>/js/main.js'
-            },
+            },<% if (addDocumentation) { %>
             jsDoc: {
                 src: [
                     '<%= sourcePath %>/js/module-a.js',
                     '<%= sourcePath %>/js/main.js',
                 ],
                 dest: <% if (jsVersion != "es5") { %>'tmp/js/main.js'<% } else { %>'<%= documentationPath %>/resources/js/main.js'<% } %>
-            }<% } %>
-        },<% if (testCssLint) { %>
+            }<% } %><% } %>
+        },<% if (testSassLint) { %>
 
-        csslint: {
-            dist: {
-                options: {
-                    csslintrc: '<%= testsPath %>/.csslintrc',
-                },
-                src: [
-                    '<%= distributionPath %>/css/main.css',
-                ]
+        sasslint: {
+            options: {
+                configFile: '<%= testsPath %>/.sass-lint.yml'
             },
-            doc: {
-                options: {
-                    csslintrc: '<%= testsPath %>/.csslintrc',
-                },
-                src: [
-                    '<%= documentationPath %>/resources/css/main.css',
-                ]
-            }
+            dist: [
+                '<%= sourcePath %>/css/**/*.scss'
+            ]
         },<% } %>
 
         cssmin: {
@@ -141,14 +131,14 @@ module.exports = function (grunt) {
                         '<%= distributionPath %>/css/main.css',
                     ]
                 }
-            },
+            },<% if (addDocumentation) { %>
             doc: {
                 files: {
                     '<%= documentationPath %>/resources/css/main.css': [
                         '<%= documentationPath %>/resources/css/main.css',
                     ]
                 }
-            }
+            }<% } %>
         },
 
         copy: {
@@ -159,8 +149,7 @@ module.exports = function (grunt) {
                     '**/*.scss',
                 ],
                 dest: '<%= distributionPath %>/scss/',
-            },
-            <% if (testMocha) { %>
+            },<% if (testMocha) { %>
             setupTestsChai: {
                 nonull: true,
                 src: [
@@ -191,7 +180,7 @@ module.exports = function (grunt) {
                     '<%= distributionPath %>/js/main.js',
                 ],
                 dest: '<%= testsPath %>/dist/js/main.js',
-            },<% } %>
+            },<% } %><% if (addDocumentation) { %>
             docCss: {
                 nonull: true,
                 src: [
@@ -213,7 +202,7 @@ module.exports = function (grunt) {
                     '**/*.{png,jpg,gif,svg}',
                 ],
                 dest: '<%= documentationPath %>/resources/img/',
-            }
+            }<% } %>
         },
 
         header: {
@@ -224,7 +213,7 @@ module.exports = function (grunt) {
                 files: {
                     '<%= distributionPath %>/css/main.css': '<%= distributionPath %>/css/main.css',
                 }
-            },
+            },<% if (addDocumentation) { %>
             cssDoc: {
                 options: {
                     text: '<%%= banner %>',
@@ -232,7 +221,7 @@ module.exports = function (grunt) {
                 files: {
                     '<%= documentationPath %>/resources/css/main.css': '<%= documentationPath %>/resources/css/main.css',
                 }
-            },
+            },<% } %>
             jsDist: {
                 options: {
                     text: '<%%= banner %>',
@@ -240,7 +229,7 @@ module.exports = function (grunt) {
                 files: {
                     '<%= distributionPath %>/js/main.js': '<%= distributionPath %>/js/main.js',
                 }
-            },
+            },<% if (addDocumentation) { %>
             jsDoc: {
                 options: {
                     text: '<%%= banner %>',
@@ -248,7 +237,7 @@ module.exports = function (grunt) {
                 files: {
                     '<%= documentationPath %>/resources/js/main.js': '<%= documentationPath %>/resources/js/main.js',
                 }
-            }
+            }<% } %>
         },
 
         imagemin: {
@@ -264,7 +253,7 @@ module.exports = function (grunt) {
                     ],
                     dest: '<%= distributionPath %>/img/',
                 }]
-            },
+            },<% if (addDocumentation) { %>
             doc: {
                 files: [{
                     expand: true,
@@ -274,9 +263,9 @@ module.exports = function (grunt) {
                     ],
                     dest: '<%= documentationPath %>/resources/img/',
                 }]
-            }
-        },
-        <% if (addDocumentation) { %>
+            }<% } %>
+        },<% if (addDocumentation) { %>
+
         jekyll: {
             options: {
                 bundleExec: true,
@@ -288,8 +277,7 @@ module.exports = function (grunt) {
                     dest: '<%= documentationPath %>',
                 }
             }
-        },<% } %>
-        <% if (testESLint) { %>
+        },<% } %><% if (testESLint) { %>
 
         eslint: {
             options: {
@@ -313,8 +301,8 @@ module.exports = function (grunt) {
                     ]
                 }
             },
-        },
-        <% } %>
+        },<% } %>
+
         uglify: {
             options: {
                 preserveComments: 'some',
@@ -325,13 +313,13 @@ module.exports = function (grunt) {
                     '<%= distributionPath %>/js/main.js',
                 ],
                 dest: '<%= distributionPath %>/js/main.min.js'
-            },
+            },<% if (addDocumentation) { %>
             doc: {
                 src: [
                     '<%= documentationPath %>/resources/js/main.js',
                 ],
                 dest: '<%= documentationPath %>/resources/js/main.js'
-            },<% if (addDocumentation && (featureModernizr || (moduleLoader == "requirejs"))) { %>
+            },<% } %><% if (addDocumentation && (featureModernizr || (moduleLoader == "requirejs"))) { %>
             docInit: {
                 src: [
                     '<%= documentationPath %>/resources/js/init.js',
@@ -349,21 +337,20 @@ module.exports = function (grunt) {
                 files: {
                     '<%= distributionPath %>/css/main.css': '<%= sourcePath %>/css/main.scss'
                 }
-            },
+            },<% if (addDocumentation) { %>
             doc: {
                 files: {
                     '<%= documentationPath %>/resources/css/main.css': '<%= sourcePath %>/css/main.scss'
                 }
-            }
-        },
-        <% if (testMocha) { %>
+            }<% } %>
+        },<% if (testMocha) { %>
 
         connect: {
             testServer: {
                 options: {
                     hostname: 'localhost',
                     port: 8080,
-                    base: 'tests/',
+                    base: '<%= testsPath %>/',
                 }
             }
         },
@@ -384,6 +371,7 @@ module.exports = function (grunt) {
                 }
             }<% } %>
         },<% } %><% if (moduleLoader == "requirejs") { %>
+
         requirejs: {
             dist: {
                 options: {
@@ -395,7 +383,7 @@ module.exports = function (grunt) {
                     out: '<%= distributionPath %>/js/main.js',
                     include: []
                 }
-            },
+            },<% if (addDocumentation) { %>
             doc: {
                 options: {
                     optimize: isDevMode ? 'none' : 'uglify2',
@@ -406,7 +394,7 @@ module.exports = function (grunt) {
                     out: '<%= documentationPath %>/resources/js/main.js',
                     include: []
                 }
-            }
+            }<% } %>
         },<% } %><% if (moduleLoader == "webpack") { %>
 
         webpack: {
@@ -440,7 +428,7 @@ module.exports = function (grunt) {
                     )
                 ],
                 devtool: isDevMode ? 'sourcemap' : ''
-            },
+            },<% if (addDocumentation) { %>
             doc: {
                 context: './',
                 entry: '<%= sourcePath %>/js/main.js',
@@ -471,7 +459,7 @@ module.exports = function (grunt) {
                     )
                 ],
                 devtool: isDevMode ? 'sourcemap' : ''
-            }
+            }<% } %>
         },<% } %>
 
         watch: {
@@ -502,11 +490,19 @@ module.exports = function (grunt) {
                     'js:watch',
                     'clean:end',
                 ]
-            }
+            },<% if (addDocumentation) { %>
+            templates: {
+                files: [
+                    '<%= sourcePath %>/jekyll/**',
+                ],
+                tasks: [
+                    'doc',
+                ]
+            }<% } %>
         }
-    });
-    <% if (testCssLint || testESLint || testMocha) { %>
-    <% if (testMocha) { %>// First setup
+    });<% if (testSassLint || testESLint || testMocha) { %><% if (testMocha) { %>
+
+    // First setup
     grunt.registerTask('setup-tests', [
         'copy:setupTestsMocha',
         'copy:setupTestsChai',
@@ -514,6 +510,7 @@ module.exports = function (grunt) {
     grunt.registerTask('setup', [
         'setup-tests',
     ]);<% } %>
+
     // Testing
     grunt.registerTask('test-js', [<% if (testESLint) { %>
         'eslint:src',<% } %><% if (testMocha) { %><% if (moduleLoader == "requirejs") { %>
@@ -528,20 +525,20 @@ module.exports = function (grunt) {
         'test-js',
     ]);<% } %>
 
-    cssTask = [
+    cssTask = [<% if (testSassLint) { %>
+        'sasslint:dist',<% } %>
         'sass:dist',
-        <% if (testCssLint) { %>'csslint:dist',<% } %>
         'copy:scss',
     ];
 
-    cssDocTask = [
+    cssDocTask = [<% if (testSassLint) { %>
+        'sasslint:dist',<% } %>
         'sass:doc',
-        <% if (testCssLint) { %>'csslint:doc',<% } %>
     ];
 
-    cssWatchTask = [
-        'sass:doc',<% if (testCssLint) { %>
-        'csslint:doc',<% } %>
+    cssWatchTask = [<% if (testSassLint) { %>
+        'sasslint:doc',<% } %>
+        'sass:doc',
     ];
 
     if (!isDevMode) {
@@ -614,14 +611,14 @@ module.exports = function (grunt) {
         'js:doc',
         'imagemin:doc',
         'clean:end',
-    ]);<% } %><% if (addDocumentation) { %>
+    ]);
 
     grunt.registerTask('serve', [
         'doc',
         'browserSync',
         'watch',
-    ]);
-    <% } %>
+    ]);<% } %>
+
     // Default task
     grunt.registerTask('default', [
         'clean:start',

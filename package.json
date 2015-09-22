@@ -7,6 +7,10 @@
     "email" : "herber@zaplab.at",
     "url" : "http://www.zaplab.at"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zaplab/gruntlate.git"
+  },
   "files": [
     "app"
   ],

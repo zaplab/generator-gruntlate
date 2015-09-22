@@ -1,0 +1,5 @@
+rules:
+  indentation:
+    - 2
+    -
+      size: <% if (indentation == 'spaces') { %><%=indentationSpaces %><% } else { %>4<% } %>

@@ -1,6 +1,6 @@
 <% if (moduleLoader == "webpack") { %>
-var webpack = require('webpack');<% } %>
-
+var webpack = require('webpack');
+<% } %>
 module.exports = function (grunt) {
     'use strict';
 
@@ -16,7 +16,7 @@ module.exports = function (grunt) {
 
     switch (target) {
         case 'dev':
-        /* falls through */
+            /* falls through */
         case 'development':
             isDevMode = true;
             break;
@@ -40,7 +40,7 @@ module.exports = function (grunt) {
             },
             dist: {
                 files: {
-                    '<%= distributionPath %>/js/main.js': 'tmp/js/main.js',
+                    '<%= distributionPath %>/resources/js/main.js': 'tmp/js/main.js',
                 }
             }
         },<% } %>
@@ -52,7 +52,7 @@ module.exports = function (grunt) {
                         '<%= distributionPath %>/resources/css/*.css',
                         '<%= distributionPath %>/resources/img/**',
                         '<%= distributionPath %>/resources/js/*.js',
-                        '<%= distributionPath %>/*.html',
+                        '<%= distributionPath %>/**/*.html',
                     ]
                 },
                 options: {
@@ -95,17 +95,15 @@ module.exports = function (grunt) {
                 ],
                 dest: <% if (jsVersion != "es5") { %>'tmp/js/main.js'<% } else { %>'<%= distributionPath %>/resources/js/main.js'<% } %>
             }<% } %>
-        },<% if (testCssLint) { %>
+        },<% if (testSassLint) { %>
 
-        csslint: {
-            dist: {
-                options: {
-                    csslintrc: '<%= testsPath %>/.csslintrc',
-                },
-                src: [
-                    '<%= distributionPath %>/resources/css/main.css',
-                ]
-            }
+        sasslint: {
+            options: {
+                configFile: '<%= testsPath %>/.sass-lint.yml'
+            },
+            dist: [
+                '<%= sourcePath %>/css/**/*.scss'
+            ]
         },<% } %>
 
         cssmin: {
@@ -222,8 +220,8 @@ module.exports = function (grunt) {
                     ]
                 }
             }
-        },
-        <% } %>
+        },<% } %>
+
         uglify: {
             options: {
                 preserveComments: 'some',
@@ -253,15 +251,14 @@ module.exports = function (grunt) {
                     '<%= distributionPath %>/resources/css/main.css': '<%= sourcePath %>/css/main.scss',
                 }
             }
-        },
-        <% if (testMocha) { %>
+        },<% if (testMocha) { %>
 
         connect: {
             testServer: {
                 options: {
                     hostname: 'localhost',
                     port: 8080,
-                    base: 'tests/',
+                    base: '<%= testsPath %>/',
                 }
             }
         },
@@ -358,11 +355,19 @@ module.exports = function (grunt) {
                     'js:watch',
                     'clean:end',
                 ]
-            }
+            },<% if (htmlJekyll) { %>
+            templates: {
+                files: [
+                    '<%= sourcePath %>/jekyll/**',
+                ],
+                tasks: [
+                    'default',
+                ]
+            }<% } %>
         }
-    });
-    <% if (testCssLint || testESLint || testMocha) { %>
-    <% if (testMocha) { %>// First setup
+    });<% if (testSassLint || testESLint || testMocha) { %><% if (testMocha) { %>
+
+    // First setup
     grunt.registerTask('setup-tests', [
         'copy:setupTestsMocha',
         'copy:setupTestsChai',
@@ -370,9 +375,10 @@ module.exports = function (grunt) {
     grunt.registerTask('setup', [
         'setup-tests',
     ]);<% } %>
+
     // Testing
     grunt.registerTask('test-css', [
-        <% if (testCssLint) { %>'csslint:dist',<% } %>
+        <% if (testSassLint) { %>'sasslint:dist',<% } %>
     ]);
     grunt.registerTask('test-js', [
         <% if (testESLint) { %>'eslint:src',<% } %><% if (testMocha) { %><% if (moduleLoader == "requirejs") { %>
@@ -386,14 +392,14 @@ module.exports = function (grunt) {
         'test-js',
     ]);<% } %>
 
-    cssTask = [
-        'sass:dist',<% if (testCssLint) { %>
+    cssTask = [<% if (testSassLint) { %>
         'test-css',<% } %>
+        'sass:dist',
     ];
 
-    cssWatchTask = [
-        'sass:dist',<% if (testCssLint) { %>
-        'csslint:dist',<% } %>
+    cssWatchTask = [<% if (testSassLint) { %>
+        'sasslint:dist',<% } %>
+        'sass:dist',
     ];
 
     if (!isDevMode) {
