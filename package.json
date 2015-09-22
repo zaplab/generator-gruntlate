@@ -1,20 +1,22 @@
 {
   "name": "generator-gruntlate",
-  "version": "0.1.1",
+  "version": "0.2.1",
   "description": "grunt-based project yeoman-generator",
   "author": {
-    "name" : "Sebastian Herber",
-    "email" : "herber@zaplab.at",
-    "url" : "http://www.zaplab.at"
+    "name": "Sebastian Herber",
+    "email": "herber@zaplab.at",
+    "url": "http://www.zaplab.at"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/zaplab/gruntlate.git"
+    "url": "https://github.com/zaplab/generator-gruntlate.git"
   },
   "files": [
     "app"
   ],
-  "keywords": ["yeoman-generator"],
+  "keywords": [
+    "yeoman-generator"
+  ],
   "dependencies": {
     "chalk": "^1.0.0",
     "yeoman-generator": "^0.17.3"
