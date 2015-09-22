@@ -40,7 +40,7 @@ module.exports = function (grunt) {
             },
             dist: {
                 files: {
-                    '<%= distributionPath %>/js/main.js': 'tmp/js/main.js',
+                    '<%= distributionPath %>/resources/js/main.js': 'tmp/js/main.js',
                 }
             }
         },<% } %>
@@ -95,17 +95,15 @@ module.exports = function (grunt) {
                 ],
                 dest: <% if (jsVersion != "es5") { %>'tmp/js/main.js'<% } else { %>'<%= distributionPath %>/resources/js/main.js'<% } %>
             }<% } %>
-        },<% if (testCssLint) { %>
+        },<% if (testSassLint) { %>
 
-        csslint: {
-            dist: {
-                options: {
-                    csslintrc: '<%= testsPath %>/.csslintrc',
-                },
-                src: [
-                    '<%= distributionPath %>/resources/css/main.css',
-                ]
-            }
+        sasslint: {
+            options: {
+                configFile: '<%= testsPath %>/.sass-lint.yml'
+            },
+            dist: [
+                '<%= sourcePath %>/css/**/*.scss'
+            ]
         },<% } %>
 
         cssmin: {
@@ -361,7 +359,7 @@ module.exports = function (grunt) {
             }
         }
     });
-    <% if (testCssLint || testESLint || testMocha) { %>
+    <% if (testSassLint || testESLint || testMocha) { %>
     <% if (testMocha) { %>// First setup
     grunt.registerTask('setup-tests', [
         'copy:setupTestsMocha',
@@ -372,7 +370,7 @@ module.exports = function (grunt) {
     ]);<% } %>
     // Testing
     grunt.registerTask('test-css', [
-        <% if (testCssLint) { %>'csslint:dist',<% } %>
+        <% if (testSassLint) { %>'sasslint:dist',<% } %>
     ]);
     grunt.registerTask('test-js', [
         <% if (testESLint) { %>'eslint:src',<% } %><% if (testMocha) { %><% if (moduleLoader == "requirejs") { %>
@@ -386,14 +384,14 @@ module.exports = function (grunt) {
         'test-js',
     ]);<% } %>
 
-    cssTask = [
-        'sass:dist',<% if (testCssLint) { %>
+    cssTask = [<% if (testSassLint) { %>
         'test-css',<% } %>
+        'sass:dist',
     ];
 
-    cssWatchTask = [
-        'sass:dist',<% if (testCssLint) { %>
-        'csslint:dist',<% } %>
+    cssWatchTask = [<% if (testSassLint) { %>
+        'sasslint:dist',<% } %>
+        'sass:dist',
     ];
 
     if (!isDevMode) {

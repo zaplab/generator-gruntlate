@@ -110,25 +110,15 @@ module.exports = function (grunt) {
                 ],
                 dest: <% if (jsVersion != "es5") { %>'tmp/js/main.js'<% } else { %>'<%= documentationPath %>/resources/js/main.js'<% } %>
             }<% } %>
-        },<% if (testCssLint) { %>
+        },<% if (testSassLint) { %>
 
-        csslint: {
-            dist: {
-                options: {
-                    csslintrc: '<%= testsPath %>/.csslintrc',
-                },
-                src: [
-                    '<%= distributionPath %>/css/main.css',
-                ]
+        sasslint: {
+            options: {
+                configFile: '<%= testsPath %>/.sass-lint.yml'
             },
-            doc: {
-                options: {
-                    csslintrc: '<%= testsPath %>/.csslintrc',
-                },
-                src: [
-                    '<%= documentationPath %>/resources/css/main.css',
-                ]
-            }
+            dist: [
+                '<%= sourcePath %>/css/**/*.scss'
+            ]
         },<% } %>
 
         cssmin: {
@@ -505,7 +495,7 @@ module.exports = function (grunt) {
             }
         }
     });
-    <% if (testCssLint || testESLint || testMocha) { %>
+    <% if (testSassLint || testESLint || testMocha) { %>
     <% if (testMocha) { %>// First setup
     grunt.registerTask('setup-tests', [
         'copy:setupTestsMocha',
@@ -528,20 +518,20 @@ module.exports = function (grunt) {
         'test-js',
     ]);<% } %>
 
-    cssTask = [
+    cssTask = [<% if (testSassLint) { %>
+        'sasslint:dist',<% } %>
         'sass:dist',
-        <% if (testCssLint) { %>'csslint:dist',<% } %>
         'copy:scss',
     ];
 
-    cssDocTask = [
+    cssDocTask = [<% if (testSassLint) { %>
+        'sasslint:dist',<% } %>
         'sass:doc',
-        <% if (testCssLint) { %>'csslint:doc',<% } %>
     ];
 
-    cssWatchTask = [
-        'sass:doc',<% if (testCssLint) { %>
-        'csslint:doc',<% } %>
+    cssWatchTask = [<% if (testSassLint) { %>
+        'sasslint:doc',<% } %>
+        'sass:doc',
     ];
 
     if (!isDevMode) {

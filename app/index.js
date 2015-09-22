@@ -295,8 +295,8 @@ module.exports = yeoman.generators.Base.extend({
             message: 'Tests',
             choices: [
                 {
-                    name: 'CSS Lint',
-                    value: 'csslint',
+                    name: 'SASS Lint',
+                    value: 'sasslint',
                     checked: true
                 },
                 {
@@ -313,10 +313,10 @@ module.exports = yeoman.generators.Base.extend({
         }, function (answers) {
             var features = answers.tests;
 
-            this.testCssLint = hasFeature(features, 'csslint');
+            this.testSassLint = hasFeature(features, 'sasslint');
             this.testESLint = hasFeature(features, 'eslint');
             this.testMocha = hasFeature(features, 'mocha');
-            this.config.set('testCssLint', this.testCssLint);
+            this.config.set('testSassLint', this.testSassLint);
             this.config.set('testESLint', this.testESLint);
             this.config.set('testMocha', this.testMocha);
 
@@ -326,7 +326,7 @@ module.exports = yeoman.generators.Base.extend({
 
     promptTestsPath: function ()
     {
-        if (this.testCssLint || this.testESLint || this.testMocha) {
+        if (this.testSassLint || this.testESLint || this.testMocha) {
             var done = this.async();
 
             this.prompt({
@@ -444,9 +444,9 @@ module.exports = yeoman.generators.Base.extend({
             this.write('bower.json', JSON.stringify(bower, null, 2));
         },
 
-        csslint: function () {
-            if (this.testCssLint) {
-                this.copy('tests/csslintrc', this.testsPath + '/.csslintrc');
+        sasslint: function () {
+            if (this.testSassLint) {
+                this.copy('tests/sass-lint.yml', this.testsPath + '/.sass-lint.yml');
             }
         },
 
@@ -502,6 +502,7 @@ module.exports = yeoman.generators.Base.extend({
                 devDependencies: {
                     bower: '^1.4.1',
                     grunt: '^0.4.5',
+                    'grunt-babel': '^5.0.3',
                     'grunt-cli': '^0.1.13',
                     'grunt-contrib-clean': '^0.6.0',
                     'grunt-contrib-concat': '^0.5.1',
@@ -520,8 +521,8 @@ module.exports = yeoman.generators.Base.extend({
                 }
             };
 
-            if (this.testCssLint) {
-                packageJSON.devDependencies['grunt-contrib-csslint'] = '^0.4.0';
+            if (this.testSassLint) {
+                packageJSON.devDependencies['grunt-sass-lint'] = 'https://github.com/sasstools/grunt-sass-lint.git';
             }
 
             if (this.testESLint) {
