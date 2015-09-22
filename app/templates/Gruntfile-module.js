@@ -353,7 +353,7 @@ module.exports = function (grunt) {
                 options: {
                     hostname: 'localhost',
                     port: 8080,
-                    base: 'tests/',
+                    base: '<%= testsPath %>/',
                 }
             }
         },
