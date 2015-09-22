@@ -44,12 +44,12 @@ module.exports = function (grunt) {
                 files: {
                     '<%= distributionPath %>/js/main.js': '<%= distributionPath %>/js/main.js',
                 }
-            },
+            },<% if (addDocumentation) { %>
             doc: {
                 files: {
                     '<%= documentationPath %>/resources/js/main.js': 'tmp/js/main.js',
                 }
-            }
+            }<% } %>
         },<% } %><% if (addDocumentation) { %>
 
         browserSync: {
@@ -102,14 +102,14 @@ module.exports = function (grunt) {
                     '<%= sourcePath %>/js/main.js',
                 ],
                 dest: '<%= distributionPath %>/js/main.js'
-            },
+            },<% if (addDocumentation) { %>
             jsDoc: {
                 src: [
                     '<%= sourcePath %>/js/module-a.js',
                     '<%= sourcePath %>/js/main.js',
                 ],
                 dest: <% if (jsVersion != "es5") { %>'tmp/js/main.js'<% } else { %>'<%= documentationPath %>/resources/js/main.js'<% } %>
-            }<% } %>
+            }<% } %><% } %>
         },<% if (testSassLint) { %>
 
         sasslint: {
@@ -131,14 +131,14 @@ module.exports = function (grunt) {
                         '<%= distributionPath %>/css/main.css',
                     ]
                 }
-            },
+            },<% if (addDocumentation) { %>
             doc: {
                 files: {
                     '<%= documentationPath %>/resources/css/main.css': [
                         '<%= documentationPath %>/resources/css/main.css',
                     ]
                 }
-            }
+            }<% } %>
         },
 
         copy: {
@@ -180,7 +180,7 @@ module.exports = function (grunt) {
                     '<%= distributionPath %>/js/main.js',
                 ],
                 dest: '<%= testsPath %>/dist/js/main.js',
-            },<% } %>
+            },<% } %><% if (addDocumentation) { %>
             docCss: {
                 nonull: true,
                 src: [
@@ -202,7 +202,7 @@ module.exports = function (grunt) {
                     '**/*.{png,jpg,gif,svg}',
                 ],
                 dest: '<%= documentationPath %>/resources/img/',
-            }
+            }<% } %>
         },
 
         header: {
@@ -213,7 +213,7 @@ module.exports = function (grunt) {
                 files: {
                     '<%= distributionPath %>/css/main.css': '<%= distributionPath %>/css/main.css',
                 }
-            },
+            },<% if (addDocumentation) { %>
             cssDoc: {
                 options: {
                     text: '<%%= banner %>',
@@ -221,7 +221,7 @@ module.exports = function (grunt) {
                 files: {
                     '<%= documentationPath %>/resources/css/main.css': '<%= documentationPath %>/resources/css/main.css',
                 }
-            },
+            },<% } %>
             jsDist: {
                 options: {
                     text: '<%%= banner %>',
@@ -229,7 +229,7 @@ module.exports = function (grunt) {
                 files: {
                     '<%= distributionPath %>/js/main.js': '<%= distributionPath %>/js/main.js',
                 }
-            },
+            },<% if (addDocumentation) { %>
             jsDoc: {
                 options: {
                     text: '<%%= banner %>',
@@ -237,7 +237,7 @@ module.exports = function (grunt) {
                 files: {
                     '<%= documentationPath %>/resources/js/main.js': '<%= documentationPath %>/resources/js/main.js',
                 }
-            }
+            }<% } %>
         },
 
         imagemin: {
@@ -253,7 +253,7 @@ module.exports = function (grunt) {
                     ],
                     dest: '<%= distributionPath %>/img/',
                 }]
-            },
+            },<% if (addDocumentation) { %>
             doc: {
                 files: [{
                     expand: true,
@@ -263,9 +263,9 @@ module.exports = function (grunt) {
                     ],
                     dest: '<%= documentationPath %>/resources/img/',
                 }]
-            }
-        },
-        <% if (addDocumentation) { %>
+            }<% } %>
+        },<% if (addDocumentation) { %>
+
         jekyll: {
             options: {
                 bundleExec: true,
@@ -313,13 +313,13 @@ module.exports = function (grunt) {
                     '<%= distributionPath %>/js/main.js',
                 ],
                 dest: '<%= distributionPath %>/js/main.min.js'
-            },
+            },<% if (addDocumentation) { %>
             doc: {
                 src: [
                     '<%= documentationPath %>/resources/js/main.js',
                 ],
                 dest: '<%= documentationPath %>/resources/js/main.js'
-            },<% if (addDocumentation && (featureModernizr || (moduleLoader == "requirejs"))) { %>
+            },<% } %><% if (addDocumentation && (featureModernizr || (moduleLoader == "requirejs"))) { %>
             docInit: {
                 src: [
                     '<%= documentationPath %>/resources/js/init.js',
@@ -337,14 +337,13 @@ module.exports = function (grunt) {
                 files: {
                     '<%= distributionPath %>/css/main.css': '<%= sourcePath %>/css/main.scss'
                 }
-            },
+            },<% if (addDocumentation) { %>
             doc: {
                 files: {
                     '<%= documentationPath %>/resources/css/main.css': '<%= sourcePath %>/css/main.scss'
                 }
-            }
-        },
-        <% if (testMocha) { %>
+            }<% } %>
+        },<% if (testMocha) { %>
 
         connect: {
             testServer: {
@@ -384,7 +383,7 @@ module.exports = function (grunt) {
                     out: '<%= distributionPath %>/js/main.js',
                     include: []
                 }
-            },
+            },<% if (addDocumentation) { %>
             doc: {
                 options: {
                     optimize: isDevMode ? 'none' : 'uglify2',
@@ -395,7 +394,7 @@ module.exports = function (grunt) {
                     out: '<%= documentationPath %>/resources/js/main.js',
                     include: []
                 }
-            }
+            }<% } %>
         },<% } %><% if (moduleLoader == "webpack") { %>
 
         webpack: {
@@ -429,7 +428,7 @@ module.exports = function (grunt) {
                     )
                 ],
                 devtool: isDevMode ? 'sourcemap' : ''
-            },
+            },<% if (addDocumentation) { %>
             doc: {
                 context: './',
                 entry: '<%= sourcePath %>/js/main.js',
@@ -460,7 +459,7 @@ module.exports = function (grunt) {
                     )
                 ],
                 devtool: isDevMode ? 'sourcemap' : ''
-            }
+            }<% } %>
         },<% } %>
 
         watch: {
@@ -604,14 +603,14 @@ module.exports = function (grunt) {
         'js:doc',
         'imagemin:doc',
         'clean:end',
-    ]);<% } %><% if (addDocumentation) { %>
+    ]);
 
     grunt.registerTask('serve', [
         'doc',
         'browserSync',
         'watch',
-    ]);
-    <% } %>
+    ]);<% } %>
+
     // Default task
     grunt.registerTask('default', [
         'clean:start',
