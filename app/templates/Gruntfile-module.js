@@ -59,7 +59,7 @@ module.exports = function (grunt) {
                         '<%= documentationPath %>/resources/css/*.css',
                         '<%= documentationPath %>/resources/img/**',
                         '<%= documentationPath %>/resources/js/*.js',
-                        '<%= documentationPath %>/*/*.html',
+                        '<%= documentationPath %>/**/*.html',
                     ]
                 },
                 options: {
@@ -490,7 +490,15 @@ module.exports = function (grunt) {
                     'js:watch',
                     'clean:end',
                 ]
-            }
+            },<% if (addDocumentation) { %>
+            templates: {
+                files: [
+                    '<%= sourcePath %>/jekyll/**',
+                ],
+                tasks: [
+                    'doc',
+                ]
+            }<% } %>
         }
     });<% if (testSassLint || testESLint || testMocha) { %><% if (testMocha) { %>
 

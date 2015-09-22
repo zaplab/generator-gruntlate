@@ -52,7 +52,7 @@ module.exports = function (grunt) {
                         '<%= distributionPath %>/resources/css/*.css',
                         '<%= distributionPath %>/resources/img/**',
                         '<%= distributionPath %>/resources/js/*.js',
-                        '<%= distributionPath %>/*.html',
+                        '<%= distributionPath %>/**/*.html',
                     ]
                 },
                 options: {
@@ -355,7 +355,15 @@ module.exports = function (grunt) {
                     'js:watch',
                     'clean:end',
                 ]
-            }
+            },<% if (htmlJekyll) { %>
+            templates: {
+                files: [
+                    '<%= sourcePath %>/jekyll/**',
+                ],
+                tasks: [
+                    'default',
+                ]
+            }<% } %>
         }
     });<% if (testSassLint || testESLint || testMocha) { %><% if (testMocha) { %>
 
