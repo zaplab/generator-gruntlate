@@ -1,6 +1,6 @@
 <% if (moduleLoader == "webpack") { %>
-var webpack = require('webpack');<% } %>
-
+var webpack = require('webpack');
+<% } %>
 module.exports = function (grunt) {
     'use strict';
 
@@ -18,7 +18,7 @@ module.exports = function (grunt) {
 
     switch (target) {
         case 'dev':
-        /* falls through */
+            /* falls through */
         case 'development':
             isDevMode = true;
             break;
@@ -67,8 +67,8 @@ module.exports = function (grunt) {
                     server: './<%= documentationPath %>',
                 }
             }
-        },
-        <% } %>
+        },<% } %>
+
         clean: {
             start: [
                 'tmp',
@@ -149,8 +149,7 @@ module.exports = function (grunt) {
                     '**/*.scss',
                 ],
                 dest: '<%= distributionPath %>/scss/',
-            },
-            <% if (testMocha) { %>
+            },<% if (testMocha) { %>
             setupTestsChai: {
                 nonull: true,
                 src: [
@@ -278,8 +277,7 @@ module.exports = function (grunt) {
                     dest: '<%= documentationPath %>',
                 }
             }
-        },<% } %>
-        <% if (testESLint) { %>
+        },<% } %><% if (testESLint) { %>
 
         eslint: {
             options: {
@@ -303,8 +301,8 @@ module.exports = function (grunt) {
                     ]
                 }
             },
-        },
-        <% } %>
+        },<% } %>
+
         uglify: {
             options: {
                 preserveComments: 'some',
@@ -374,6 +372,7 @@ module.exports = function (grunt) {
                 }
             }<% } %>
         },<% } %><% if (moduleLoader == "requirejs") { %>
+
         requirejs: {
             dist: {
                 options: {
@@ -494,9 +493,9 @@ module.exports = function (grunt) {
                 ]
             }
         }
-    });
-    <% if (testSassLint || testESLint || testMocha) { %>
-    <% if (testMocha) { %>// First setup
+    });<% if (testSassLint || testESLint || testMocha) { %><% if (testMocha) { %>
+
+    // First setup
     grunt.registerTask('setup-tests', [
         'copy:setupTestsMocha',
         'copy:setupTestsChai',
@@ -504,6 +503,7 @@ module.exports = function (grunt) {
     grunt.registerTask('setup', [
         'setup-tests',
     ]);<% } %>
+
     // Testing
     grunt.registerTask('test-js', [<% if (testESLint) { %>
         'eslint:src',<% } %><% if (testMocha) { %><% if (moduleLoader == "requirejs") { %>
